@@ -16,6 +16,7 @@
  
 #include "SFE_CC3000.h"
 #include "SFE_CC3000_SPI.h"
+#include "debug.h"
  
  /**
   * @brief Constructor - Instantiates SFE_CC3000 object
@@ -44,6 +45,9 @@ SFE_CC3000::~SFE_CC3000()
  */
 bool SFE_CC3000::init()
 {
+#if (DEBUG == 1)
+    Serial.println("Initializing CC3000");
+#endif
     return true;
 }
 

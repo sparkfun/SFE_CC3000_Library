@@ -27,11 +27,11 @@
  
  */
  
-#include <SPI.h>
+//#include <SPI.h>
 #include <SFE_CC3000.h>
 
 // Pins
-#define CC3000_INT  3  // Needs to be an interrupt pin
+#define CC3000_INT  2  // Needs to be an interrupt pin
 #define CC3000_EN   7  // Can be any digital pin
 #define CC3000_CS   10 // Preferred is pin 10 on Uno
 
