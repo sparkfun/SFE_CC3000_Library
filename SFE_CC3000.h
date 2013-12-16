@@ -14,10 +14,8 @@
 
 #ifndef SFE_CC3000_H
 #define SFE_CC3000_H
- 
+
 #include <Arduino.h>
- 
-//#include "SFE_CC3000_SPI.h"
  
 class SFE_CC3000 {
     // ***TODO: Put in struct?
@@ -31,3 +29,5 @@ public:
     bool connect(const char *ssid, const char *password, uint8_t sec);
 private:
 };
+
+#endif

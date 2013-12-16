@@ -1,3 +1,23 @@
+/**
+ * @file	evnt_handler.cpp
+ * @brief 	CC3000 library functions to handle WiFi networking
+ * @author	Texas Instruments
+ * @author  Modified by Shawn Hymel (SparkFun Electronics)
+ *
+ * Changes to the original code are listed below:
+ * 
+ * - Changed file name from *.c to *.cpp to force the Arduino compiler to
+ *   treat it as a C++ file
+ *
+ * - The line
+ *      #include "spi.h"
+ *   changed to
+ *      #include "../SFE_CC3000_SPI.h"
+ *   to use Arduino's built-in SPI functions
+ *
+ * 
+ */
+
 /*****************************************************************************
 *
 *  wlan.c  - CC3000 Host Driver Implementation.
@@ -42,7 +62,7 @@
 #include <string.h>
 #include "wlan.h"
 #include "hci.h"
-#include "spi.h"
+#include "../SFE_CC3000_SPI.h"
 #include "socket.h"
 #include "nvmem.h"
 #include "security.h"
@@ -1135,7 +1155,6 @@ wlan_smart_config_set_prefix(char* cNewPrefix)
 //!           behavior is as defined by connection policy.
 //
 //*****************************************************************************
-
 
 #ifndef CC3000_UNENCRYPTED_SMART_CONFIG
 long

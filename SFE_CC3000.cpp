@@ -12,7 +12,10 @@
  * necessary connection details.
  */
 
+#include <Arduino.h>
+ 
 #include "SFE_CC3000.h"
+#include "SFE_CC3000_SPI.h"
  
  /**
   * @brief Constructor - Instantiates SFE_CC3000 object
@@ -29,7 +32,7 @@ SFE_CC3000::SFE_CC3000(uint8_t int_pin, uint8_t en_pin, uint8_t cs_pin)
 /**
  * @brief Destructor
  */
-SFE_CC3000::SFE_3000()
+SFE_CC3000::~SFE_CC3000()
 {
 
 }

@@ -1,3 +1,28 @@
+/**
+ * @file	evnt_handler.cpp
+ * @brief 	CC3000 library functions to handle asynchronous events
+ * @author	Texas Instruments
+ * @author  Modified by Shawn Hymel (SparkFun Electronics)
+ *
+ * Changes to the original code are listed below:
+ * 
+ * - Changed file name from *.c to *.cpp to force the Arduino compiler to
+ *   treat it as a C++ file
+ *
+ * - The line
+ *      #include "spi.h"
+ *   changed to
+ *      #include "../SFE_CC3000_SPI.h"
+ *   to use Arduino's built-in SPI functions
+ *
+ * - In function hci_event_handler(), the line
+ *      RetParams = pRetParams;
+ *   changed to
+ *      RetParams = (unsigned char *)pRetParams;
+ *   to fix implicit cast    
+ *   
+ */
+
 /*****************************************************************************
 *
 *  evnt_handler.c  - CC3000 Host Driver Implementation.
@@ -50,7 +75,7 @@
 #include "wlan.h"
 #include "socket.h"
 #include "netapp.h"
-#include "spi.h"
+#include "../SFE_CC3000_SPI.h"
 
  
 
@@ -249,7 +274,7 @@ hci_event_handler(void *pRetParams, unsigned char *from, unsigned char *fromlen)
 												 usReceivedEventOpcode);
 				pucReceivedParams = pucReceivedData + HCI_EVENT_HEADER_SIZE;		
 				RecvParams = pucReceivedParams;
-				RetParams = pRetParams;
+				RetParams = (unsigned char *)pRetParams;
 				
 				// In case unsolicited event received - here the handling finished
 				if (hci_unsol_event_handler((char *)pucReceivedData) == 0)

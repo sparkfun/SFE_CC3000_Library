@@ -1,3 +1,25 @@
+/**
+ * @file	security.h
+ * @brief 	CC3000 library functions to handle WiFi security
+ * @author	Texas Instruments
+ * @author  Modified by Shawn Hymel (SparkFun Electronics)
+ *
+ * Changes to the original code are listed below:
+ * 
+ * - Changed file name from *.c to *.cpp to force the Arduino compiler to
+ *   treat it as a C++ file
+ *
+ * - Added (at the end of the file):
+ *      #ifdef  __cplusplus
+ *      }
+ *      #endif
+ *   to close (at the beginning):
+ *      #ifdef  __cplusplus
+ *      extern "C" {
+ *      #endif
+ * 
+ */
+
 /*****************************************************************************
 *
 *  security.h  - CC3000 Host Driver Implementation.
@@ -122,5 +144,9 @@ extern signed long aes_read_key(unsigned char *key);
 extern signed long aes_write_key(unsigned char *key);
 
 #endif //CC3000_UNENCRYPTED_SMART_CONFIG
+
+#ifdef  __cplusplus
+}
+#endif
 
 #endif
