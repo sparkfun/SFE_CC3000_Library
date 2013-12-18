@@ -18,16 +18,16 @@
 #include <Arduino.h>
  
 class SFE_CC3000 {
-    // ***TODO: Put in struct?
-    uint8_t pin_int;
-    uint8_t cc3000_en;
-    uint8_t cc3000_cs;
 public:
     SFE_CC3000(uint8_t int_pin, uint8_t en_pin, uint8_t cs_pin);
     ~SFE_CC3000();
     bool init();
     bool connect(const char *ssid, const char *password, uint8_t sec);
 private:
+    uint8_t int_pin_;
+    uint8_t en_pin_;
+    uint8_t cs_pin_;
+    bool is_initialized_;
 };
 
 #endif

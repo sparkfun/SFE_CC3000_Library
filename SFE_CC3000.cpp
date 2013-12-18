@@ -27,7 +27,10 @@
   */
 SFE_CC3000::SFE_CC3000(uint8_t int_pin, uint8_t en_pin, uint8_t cs_pin)
 {
-
+    int_pin_ = int_pin;
+    en_pin_ = en_pin;
+    cs_pin_ = cs_pin;
+    is_initialized_ = false;
 }
 
 /**
@@ -45,9 +48,30 @@ SFE_CC3000::~SFE_CC3000()
  */
 bool SFE_CC3000::init()
 {
+
 #if (DEBUG == 1)
     Serial.println("Initializing CC3000");
 #endif
+
+    /* Check if CC3000 SPI is already initialized */
+    if (is_initialized_) {
+        return true;
+    }
+    
+    /* Set interrupt pin to input */
+    
+    /* Set CC3000 enable pin to output and initialize low */
+    
+    /* Set chip select pin to output and initialize high */
+    
+    /* Setup SPI */
+    
+    /* Initialize CC3000 library - provide callback definitions */
+    
+    /* Start CC3000 - asserts enable pin and blocks until init is complete */
+    
+    is_initialized_ = true;
+
     return true;
 }
 
