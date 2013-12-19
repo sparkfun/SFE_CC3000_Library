@@ -27,7 +27,7 @@
  
  */
  
-//#include <SPI.h>
+#include <SPI.h>
 #include <SFE_CC3000.h>
 
 // Pins
@@ -50,6 +50,8 @@ void setup() {
   // Read and display CC3000 firmware version
   
   // Read and display CC3000 MAC address
+  
+  Serial.println("Finished board test.");
   
 }
 
