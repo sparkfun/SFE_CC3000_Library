@@ -16,7 +16,7 @@
 #define SFE_CC3000_H
 
 #include <Arduino.h>
- 
+
 class SFE_CC3000 {
 public:
     SFE_CC3000(uint8_t int_pin, uint8_t en_pin, uint8_t cs_pin);
@@ -24,8 +24,6 @@ public:
     bool init();
     bool connect(const char *ssid, const char *password, uint8_t sec);
 private:
-    uint8_t int_pin_;
-    uint8_t en_pin_;
     uint8_t cs_pin_;
     bool is_initialized_;
 };

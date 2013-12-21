@@ -67,6 +67,7 @@ extern long SpiWrite(unsigned char *pUserBuffer, unsigned short usLength);
 extern void SpiResumeSpi(void);
 extern void SpiCleanGPIOISR(void);
 extern int init_spi(void);
+extern void cc3000_ISR(void);
 
 #endif
 

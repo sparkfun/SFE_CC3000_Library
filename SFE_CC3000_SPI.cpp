@@ -106,24 +106,6 @@ void SSIContReadOperation(void);
 // it is written - the overrun occurred and either receive function or send
 // function will stuck forever.
 #define CC3000_BUFFER_MAGIC_NUMBER (0xDE)
-
-//*****************************************************************************
-// 
-//!  SpiCleanGPIOISR
-//! 
-//!  \param  none
-//! 
-//!  \return none
-//! 
-//!  \brief  This function get the reason for the GPIO interrupt and clear
-//!          corresponding interrupt flag
-// 
-//*****************************************************************************
-void
-SpiCleanGPIOISR(void)
-{
-    
-}
  
 //*****************************************************************************
 //
@@ -179,81 +161,6 @@ SpiOpen(gcSpiHandleRx pfRxHandler)
 	tSLInformation.WlanInterruptEnable();
     */
 }
-
-//*****************************************************************************
-//
-//!  init_spi
-//!
-//!  @param  none
-//!
-//!  @return none
-//!
-//!  @brief  initializes an SPI interface
-//
-//*****************************************************************************
-
-int init_spi(void)
-{
-
-    /*
-	// Select the SPI lines: MISO/MOSI on P1.6,7 
-	MOSI_MISO_PORT_SEL |= (SPI_MISO_PIN + SPI_MOSI_PIN);
-	MOSI_MISO_PORT_SEL2 &= (~(SPI_MISO_PIN + SPI_MOSI_PIN));
-	//CLK on P2.2
-	SPI_CLK_PORT_SEL |= (SPI_CLK_PIN);
-	SPI_CLK_PORT_SEL2 &= ~SPI_CLK_PIN;
-	
-	UCB0CTLW0 |= UCSWRST;                     // Put state machine in reset
-	UCB0CTLW0 |= (UCMST+UCSYNC+UCMSB);      	// 3-pin, 8-bit SPI master
-	// Clock polarity high, MSB
-	UCB0CTLW0 |= UCSSEL_2;                    // ACLK
-	UCB0BR0 = 0x02;                           // /2 change to /1
-	UCB0BR1 = 0;                              //
-	
-	UCB0CTLW0 &= ~UCSWRST;                    //Initialize USCI state machine
-	*/
-    
-	return(ESUCCESS);
-}
-
-//*****************************************************************************
-//
-//! SpiFirstWrite
-//!
-//!  @param  ucBuf     buffer to write
-//!  @param  usLength  buffer's length
-//!
-//!  @return none
-//!
-//!  @brief  enter point for first write flow
-//
-//*****************************************************************************
-long
-SpiFirstWrite(unsigned char *ucBuf, unsigned short usLength)
-{
-	/*
-    // workaround for first transaction
-	ASSERT_CS();
-	
-	// Assuming we are running on 24 MHz ~50 micro delay is 1200 cycles;
-	__delay_cycles(1200);
-	
-	// SPI writes first 4 bytes of data
-	SpiWriteDataSynchronous(ucBuf, 4);
-	
-	__delay_cycles(1200);
-	
-	SpiWriteDataSynchronous(ucBuf + 4, usLength - 4);
-	
-	// From this point on - operate in a regular way
-	sSpiInformation.ulSpiState = eSPI_STATE_IDLE;
-	
-	DEASSERT_CS();
-    */
-	
-	return(0);
-}
-
 
 //*****************************************************************************
 //
@@ -354,178 +261,6 @@ SpiWrite(unsigned char *pUserBuffer, unsigned short usLength)
 	return(0);
 }
 
- 
-//*****************************************************************************
-//
-//!  SpiWriteDataSynchronous
-//!
-//!  @param  data  buffer to write
-//!  @param  size  buffer's size
-//!
-//!  @return none
-//!
-//!  @brief  Spi write operation
-//
-//*****************************************************************************
-void
-SpiWriteDataSynchronous(unsigned char *data, unsigned short size)
-{
-    /* Use Arduino's SPI.transfer() function
-	while (size)
-	{   	
-		while (!(TXBufferIsEmpty()));
-		UCB0TXBUF = *data;
-		while (!(RXBufferIsEmpty()));
-		UCB0RXBUF;
-		size --;
-		data++;
-	}
-    */
-}
-
-//*****************************************************************************
-//
-//! SpiReadDataSynchronous
-//!
-//!  @param  data  buffer to read
-//!  @param  size  buffer's size
-//!
-//!  @return none
-//!
-//!  @brief  Spi read operation
-//
-//*****************************************************************************
-void
-SpiReadDataSynchronous(unsigned char *data, unsigned short size)
-{
-    /* Use Arduino's SPI.transfer() function
-	long i = 0;
-	unsigned char *data_to_send = tSpiReadHeader;
-	
-	for (i = 0; i < size; i ++)
-	{
-		while (!(TXBufferIsEmpty()));
-		//Dummy write to trigger the clock
-		UCB0TXBUF = data_to_send[0];
-		while (!(RXBufferIsEmpty()));
-		data[i] = UCB0RXBUF;
-	}
-    */
-}
-
-
-//*****************************************************************************
-//
-//!  SpiReadHeader
-//!
-//!  \param  buffer
-//!
-//!  \return none
-//!
-//!  \brief   This function enter point for read flow: first we read minimal 5 
-//!	          SPI header bytes and 5 Event Data bytes
-//
-//*****************************************************************************
-void
-SpiReadHeader(void)
-{
-    /*
-	SpiReadDataSynchronous(sSpiInformation.pRxPacket, 10);
-    */
-}
-
-
-//*****************************************************************************
-//
-//!  SpiReadDataCont
-//!
-//!  @param  None
-//!
-//!  @return None
-//!
-//!  @brief  This function processes received SPI Header and in accordance with 
-//!	         it - continues reading the packet
-//
-//*****************************************************************************
-long
-SpiReadDataCont(void)
-{
-    /*
-	long data_to_recv;
-	unsigned char *evnt_buff, type;
-	
-	//determine what type of packet we have
-	evnt_buff =  sSpiInformation.pRxPacket;
-	data_to_recv = 0;
-	STREAM_TO_UINT8((char *)(evnt_buff + SPI_HEADER_SIZE), HCI_PACKET_TYPE_OFFSET,
-									type);
-	
-	switch(type)
-	{
-	case HCI_TYPE_DATA:
-		{
-			// We need to read the rest of data..
-			STREAM_TO_UINT16((char *)(evnt_buff + SPI_HEADER_SIZE), 
-											 HCI_DATA_LENGTH_OFFSET, data_to_recv);
-			if (!((HEADERS_SIZE_EVNT + data_to_recv) & 1))
-			{	
-				data_to_recv++;
-			}
-			
-			if (data_to_recv)
-			{
-				SpiReadDataSynchronous(evnt_buff + 10, data_to_recv);
-			}
-			break;
-		}
-	case HCI_TYPE_EVNT:
-		{
-			// Calculate the rest length of the data
-			STREAM_TO_UINT8((char *)(evnt_buff + SPI_HEADER_SIZE), 
-											HCI_EVENT_LENGTH_OFFSET, data_to_recv);
-			data_to_recv -= 1;
-			
-			// Add padding byte if needed
-			if ((HEADERS_SIZE_EVNT + data_to_recv) & 1)
-			{
-				
-				data_to_recv++;
-			}
-			
-			if (data_to_recv)
-			{
-				SpiReadDataSynchronous(evnt_buff + 10, data_to_recv);
-			}
-			
-			sSpiInformation.ulSpiState = eSPI_STATE_READ_EOT;
-			break;
-		}
-	}
-	*/
-    
-	return (0);
-}
-
-
-//*****************************************************************************
-//
-//! SpiPauseSpi
-//!
-//!  @param  none
-//!
-//!  @return none
-//!
-//!  @brief  Spi pause operation
-//
-//*****************************************************************************
-
-void 
-SpiPauseSpi(void)
-{
-    
-}
-
-
 //*****************************************************************************
 //
 //! SpiResumeSpi
@@ -537,66 +272,17 @@ SpiPauseSpi(void)
 //!  @brief  Spi resume operation
 //
 //*****************************************************************************
-
-void 
-SpiResumeSpi(void)
+void SpiResumeSpi(void)
 {
     
 }
 
-
-//*****************************************************************************
-//
-//! SpiTriggerRxProcessing
-//!
-//!  @param  none
-//!
-//!  @return none
-//!
-//!  @brief  Spi RX processing 
-//
-//*****************************************************************************
-void 
-SpiTriggerRxProcessing(void)
+/**
+ * @brief Interrupt Service Routine for GPIO interrupt
+ */
+void cc3000_ISR(void)
 {
-	/*
-	// Trigger Rx processing
-	SpiPauseSpi();
-	DEASSERT_CS();
-	
-	// The magic number that resides at the end of the TX/RX buffer (1 byte after 
-	// the allocated size) for the purpose of detection of the overrun. If the 
-	// magic number is overwritten - buffer overrun occurred - and we will stuck 
-	// here forever!
-	if (sSpiInformation.pRxPacket[CC3000_RX_BUFFER_SIZE - 1] != CC3000_BUFFER_MAGIC_NUMBER)
-	{
-		while (1)
-			;
-	}
-	
-	sSpiInformation.ulSpiState = eSPI_STATE_IDLE;
-	sSpiInformation.SPIRxHandler(sSpiInformation.pRxPacket + SPI_HEADER_SIZE);
-    */
-}
-
-//*****************************************************************************
-// 
-//!  IntSpiGPIOHandler
-//! 
-//!  @param  none
-//! 
-//!  @return none
-//! 
-//!  @brief  GPIO A interrupt handler. When the external SSI WLAN device is
-//!          ready to interact with Host CPU it generates an interrupt signal.
-//!          After that Host CPU has registered this interrupt request
-//!          it set the corresponding /CS in active state.
-// 
-//*****************************************************************************
-void IntSpiGPIOHandler(void)
-{
-    /*
-	switch(__even_in_range(P2IV,P2IV_P2IFG3))
+    /*switch(__even_in_range(P2IV,P2IV_P2IFG3))
 	{
 	case P2IV_P2IFG3:
 		if (sSpiInformation.ulSpiState == eSPI_STATE_POWERUP)
@@ -631,32 +317,5 @@ void IntSpiGPIOHandler(void)
 		break;
 	default:
 		break;
-	}
-	*/
-}
-
-//*****************************************************************************
-//
-//! SSIContReadOperation
-//!
-//!  @param  none
-//!
-//!  @return none
-//!
-//!  @brief  SPI read operation
-//
-//*****************************************************************************
-
-void
-SSIContReadOperation(void)
-{
-    /*
-	// The header was read - continue with  the payload read
-	if (!SpiReadDataCont())
-	{
-		// All the data was read - finalize handling by switching to the task
-		//	and calling from task Event Handler
-		SpiTriggerRxProcessing();
-	}
-    */
+	}*/
 }

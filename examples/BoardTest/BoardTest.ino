@@ -31,7 +31,7 @@
 #include <SFE_CC3000.h>
 
 // Pins
-#define CC3000_INT  2  // Needs to be an interrupt pin
+#define CC3000_INT  2  // Needs to be an interrupt pin (D2 or D3)
 #define CC3000_EN   7  // Can be any digital pin
 #define CC3000_CS   10 // Preferred is pin 10 on Uno
 
@@ -45,7 +45,9 @@ void setup() {
   Serial.println("SparkFun CC3000 - Board Test");
   
   // Initialize CC3000 (configure SPI communications)
-  wifi.init();
+  if ( !wifi.init() ) {
+    Serial.println("Something went wrong during CC3000 init!");
+  }
   
   // Read and display CC3000 firmware version
   
@@ -59,4 +61,5 @@ void loop() {
   
   // Do nothing
   delay(1000);
+  
 }
