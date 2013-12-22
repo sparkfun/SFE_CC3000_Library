@@ -9,6 +9,10 @@
  * - Changed file name from *.c to *.cpp to force the Arduino compiler to
  *   treat it as a C++ file
  *
+ * - Added the following to allow for debugging:
+ *      #include <Arduino.h>
+ *      #include "../common.h"
+ *
  * - The line
  *      #include "spi.h"
  *   changed to
@@ -67,6 +71,9 @@
 //******************************************************************************
 //                  INCLUDE FILES
 //******************************************************************************
+
+#include <Arduino.h>
+#include "../common.h"
 
 #include "cc3000_common.h"
 #include "string.h"
@@ -257,12 +264,24 @@ hci_event_handler(void *pRetParams, unsigned char *from, unsigned char *fromlen)
 	unsigned char *pucReceivedParams;
 	unsigned short usReceivedEventOpcode = 0;
 	unsigned long retValue32;
-  unsigned char * RecvParams;
-  unsigned char *RetParams;
+    unsigned char * RecvParams;
+    unsigned char *RetParams;
 	
-	
+#if (DEBUG == 1)
+    Serial.println("Event Handler: hci_event_handler()");
+    g_debug_interrupt = 255;
+#endif
+
 	while (1)
 	{
+    
+#if (DEBUG == 1)
+    Serial.print("g_debug_interrupt = ");
+    Serial.println(g_debug_interrupt);
+    Serial.print("usEventOrDataReceived = ");
+    Serial.println(tSLInformation.usEventOrDataReceived);
+#endif
+
 		if (tSLInformation.usEventOrDataReceived != 0)
 		{				
 			pucReceivedData = (tSLInformation.pucReceivedData);
@@ -328,17 +347,20 @@ hci_event_handler(void *pRetParams, unsigned char *from, unsigned char *fromlen)
 					case HCI_EVNT_CONNECT:
 					case HCI_EVNT_NVMEM_WRITE:
 						
-						STREAM_TO_UINT32((char *)pucReceivedParams,0
-														 ,*(unsigned long *)pRetParams);
+						STREAM_TO_UINT32((char *)pucReceivedParams,0,
+                                            *(unsigned long *)pRetParams);
 						break;
 						
 					case HCI_EVNT_READ_SP_VERSION:
 						
-						STREAM_TO_UINT8(pucReceivedData, HCI_EVENT_STATUS_OFFSET
-														,*(unsigned char *)pRetParams);
+						STREAM_TO_UINT8(    pucReceivedData, 
+                                            HCI_EVENT_STATUS_OFFSET,
+											*(unsigned char *)pRetParams);
 						pRetParams = ((char *)pRetParams) + 1;
-						STREAM_TO_UINT32((char *)pucReceivedParams, 0, retValue32);
-						UINT32_TO_STREAM((unsigned char *)pRetParams, retValue32);				
+						STREAM_TO_UINT32((char *)pucReceivedParams, 0, 
+                                                                retValue32);
+						UINT32_TO_STREAM((unsigned char *)pRetParams, 
+                                                                retValue32);				
 						break;
 						
 					case HCI_EVNT_BSD_GETHOSTBYNAME:
@@ -496,7 +518,7 @@ hci_event_handler(void *pRetParams, unsigned char *from, unsigned char *fromlen)
 			{
 				hci_unsol_handle_patch_request((char *)pucReceivedData);
 			}
-			
+
 			if ((tSLInformation.usRxEventOpcode == 0) && (tSLInformation.usRxDataPending == 0))
 			{
 				return NULL;
@@ -690,14 +712,16 @@ hci_unsolicited_event_handler(void)
 	if (tSLInformation.usEventOrDataReceived != 0)
 	{
 		pucReceivedData = (tSLInformation.pucReceivedData);
-		
+
 		if (*pucReceivedData == HCI_TYPE_EVNT)
 		{			
-			
 			// In case unsolicited event received - here the handling finished
 			if (hci_unsol_event_handler((char *)pucReceivedData) == 1)
 			{
-				
+            
+#if (DEBUG == 1)
+    g_debug_interrupt = 12;
+#endif
 				// There was an unsolicited event received - we can release the buffer
 				// and clean the event received 
 				tSLInformation.usEventOrDataReceived = 0;
@@ -836,6 +860,9 @@ update_socket_active_status(char *resp_params)
 void 
 SimpleLinkWaitEvent(unsigned short usOpcode, void *pRetParams)
 {
+#if (DEBUG == 1)
+    Serial.println("Event Handler: SimpleLinkWaitEvent()");
+#endif
 	// In the blocking implementation the control to caller will be returned only 
 	// after the end of current transaction
 	tSLInformation.usRxEventOpcode = usOpcode;
@@ -862,6 +889,9 @@ void
 SimpleLinkWaitData(unsigned char *pBuf, unsigned char *from, 
 									 unsigned char *fromlen)
 {
+#if (DEBUG == 1)
+    Serial.println("Event Handler: SimpleLinkWaitData()");
+#endif
 	// In the blocking implementation the control to caller will be returned only 
 	// after the end of current transaction, i.e. only after data will be received
 	tSLInformation.usRxDataPending = 1;

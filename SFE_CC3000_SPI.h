@@ -63,10 +63,15 @@ extern unsigned char wlan_tx_buffer[];
 //*****************************************************************************
 extern void SpiOpen(gcSpiHandleRx pfRxHandler);
 extern void SpiClose(void);
+extern long SpiFirstWrite(unsigned char *ucBuf, unsigned short usLength);
 extern long SpiWrite(unsigned char *pUserBuffer, unsigned short usLength);
+extern void SpiWriteDataSynchronous(unsigned char *data, unsigned short size);
+extern void SpiReadDataSynchronous(unsigned char *data, unsigned short size);
+extern void SpiReadHeader(void);
+extern long SpiReadDataCont(void);
 extern void SpiResumeSpi(void);
-extern void SpiCleanGPIOISR(void);
-extern int init_spi(void);
+extern void SSIContReadOperation(void);
+extern void SpiTriggerRxProcessing(void);
 extern void cc3000_ISR(void);
 
 #endif

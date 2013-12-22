@@ -9,6 +9,10 @@
  * - Changed file name from *.c to *.cpp to force the Arduino compiler to
  *   treat it as a C++ file
  *
+ * - Added the following to allow for debugging:
+ *      #include <Arduino.h>
+ *      #include "../common.h"
+ *
  * - The line
  *      #include "spi.h"
  *   changed to
@@ -59,6 +63,9 @@
 //! @{
 //
 //*****************************************************************************
+#include <Arduino.h>
+#include "../common.h"
+
 #include <string.h>
 #include "wlan.h"
 #include "hci.h"
@@ -142,9 +149,21 @@ static void SimpleLink_Init_Start(unsigned short usPatchesAvailableAtHost)
 	UINT8_TO_STREAM(args, ((usPatchesAvailableAtHost) ? SL_PATCHES_REQUEST_FORCE_NONE : SL_PATCHES_REQUEST_DEFAULT));
 	
 	// IRQ Line asserted - send HCI_CMND_SIMPLE_LINK_START to CC3000
+#if (DEBUG == 1)
+        Serial.println("Sending HCI command: HCI_CMND_SIMPLE_LINK_START");
+#endif
+
 	hci_command_send(HCI_CMND_SIMPLE_LINK_START, ptr, WLAN_SL_INIT_START_PARAMS_LEN);
-	
+    
+#if (DEBUG == 1)
+        Serial.println("Waiting for command to finish...");
+#endif
+
 	SimpleLinkWaitEvent(HCI_CMND_SIMPLE_LINK_START, 0);
+    
+#if (DEBUG == 1)
+        Serial.println("...Done.");
+#endif
 }
 
 
@@ -238,6 +257,9 @@ void wlan_init(		tWlanCB	 	sWlanCB,
 //*****************************************************************************
 void SpiReceiveHandler(void *pvBuffer)
 {	
+#if (DEBUG == 1)
+    g_debug_interrupt = 10;
+#endif
 	tSLInformation.usEventOrDataReceived = 1;
 	tSLInformation.pucReceivedData = (unsigned char 	*)pvBuffer;
 	
@@ -277,6 +299,10 @@ wlan_start(unsigned short usPatchesAvailableAtHost)
 {
 	
 	unsigned long ulSpiIRQState;
+    
+#if (DEBUG == 1)
+        Serial.println("Starting WLAN");
+#endif
 	
 	tSLInformation.NumberOfSentPackets = 0;
 	tSLInformation.NumberOfReleasedPackets = 0;
@@ -303,9 +329,15 @@ wlan_start(unsigned short usPatchesAvailableAtHost)
 	
 	if (ulSpiIRQState)
 	{
+#if (DEBUG == 1)
+        Serial.println("Waiting till IRQ line goes low...");
+#endif
 		// wait till the IRQ line goes low
 		while(tSLInformation.ReadWlanInterruptPin() != 0)
 		{
+#if (DEBUG == 1)
+        Serial.println("...");
+#endif
 		}
 	}
 	else
@@ -319,12 +351,26 @@ wlan_start(unsigned short usPatchesAvailableAtHost)
 		{
 		}
 	}
-	
+    
+#if (DEBUG == 1)
+        Serial.println("Initializing SimpleLink");
+#endif
 	SimpleLink_Init_Start(usPatchesAvailableAtHost);
 	
 	// Read Buffer's size and finish
+#if (DEBUG == 1)
+        Serial.println("Sending HCI command: HCI_CMND_READ_BUFFER_SIZE");
+#endif
 	hci_command_send(HCI_CMND_READ_BUFFER_SIZE, tSLInformation.pucTxCommandBuffer, 0);
+    
+#if (DEBUG == 1)
+        Serial.println("Waiting for command to finish...");
+#endif
 	SimpleLinkWaitEvent(HCI_CMND_READ_BUFFER_SIZE, 0);
+    
+#if (DEBUG == 1)
+        Serial.println("...Done.");
+#endif
 }
 
 

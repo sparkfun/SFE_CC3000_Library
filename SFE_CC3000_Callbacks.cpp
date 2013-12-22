@@ -157,6 +157,9 @@ long readWlanInterruptPin()
  */
 void enableWlanInterrupt()
 {
+#if (DEBUG == 1)
+    Serial.println("Callbacks: Enabling WLAN Interrupts");
+#endif
     attachInterrupt(g_int_num, cc3000_ISR, FALLING);
 }
 
@@ -165,6 +168,9 @@ void enableWlanInterrupt()
  */
 void disableWlanInterrupt()
 {
+#if (DEBUG == 1)
+    Serial.println("Callbacks: Disabling WLAN Interrupts");
+#endif
     detachInterrupt(g_int_num);
 }
 

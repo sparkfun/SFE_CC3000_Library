@@ -24,7 +24,6 @@ public:
     bool init();
     bool connect(const char *ssid, const char *password, uint8_t sec);
 private:
-    uint8_t cs_pin_;
     bool is_initialized_;
 };
 

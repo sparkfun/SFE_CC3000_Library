@@ -27,6 +27,10 @@
 uint8_t g_int_pin;
 uint8_t g_int_num;
 uint8_t g_en_pin;
+uint8_t g_cs_pin;
+#if (DEBUG == 1)
+volatile uint8_t g_debug_interrupt;
+#endif
  
  /**
   * @brief Constructor - Instantiates SFE_CC3000 object
@@ -44,7 +48,10 @@ SFE_CC3000::SFE_CC3000(uint8_t int_pin, uint8_t en_pin, uint8_t cs_pin)
     /* Set pin definitions */
     g_int_pin = int_pin;
     g_en_pin = en_pin;
-    cs_pin_ = cs_pin;
+    g_cs_pin = cs_pin;
+#if (DEBUG == 1)
+    g_debug_interrupt = 255;
+#endif
 
 }
 
@@ -99,9 +106,9 @@ bool SFE_CC3000::init()
     /* Initialize interrupt, CS, and enable pins */
     pinMode(g_int_pin, INPUT);
     pinMode(g_en_pin, OUTPUT);
-    pinMode(cs_pin_, OUTPUT);
+    pinMode(g_cs_pin, OUTPUT);
     digitalWrite(g_en_pin, LOW);
-    digitalWrite(cs_pin_, LOW);
+    digitalWrite(g_cs_pin, LOW);
     
     /* Setup SPI */
     SPI.begin();
@@ -120,6 +127,11 @@ bool SFE_CC3000::init()
                 writeWlanPin);
     
     /* Start CC3000 - asserts enable pin and blocks until init is complete */
+#if (DEBUG == 1)
+    Serial.print("g_debug_interrupt = ");
+    Serial.println(g_debug_interrupt);
+#endif
+    wlan_start(0);
     
     is_initialized_ = true;
 

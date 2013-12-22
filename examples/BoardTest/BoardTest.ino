@@ -10,7 +10,7 @@
  
  Performs an initialization and reads the CC3000's MAC address and
  firmware version. The MAC address and firmware version are
- displayed to the Serial Monitor.
+ displayed to the Serial Monitor. No WiFi connections are made.
  
  Hardware Connections:
  
@@ -42,7 +42,10 @@ void setup() {
   
   // Initialize Serial port
   Serial.begin(9600);
+  Serial.println();
+  Serial.println("----------------------------");
   Serial.println("SparkFun CC3000 - Board Test");
+  Serial.println("----------------------------");
   
   // Initialize CC3000 (configure SPI communications)
   if ( !wifi.init() ) {
