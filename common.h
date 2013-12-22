@@ -21,7 +21,7 @@ extern uint8_t g_en_pin;
 extern uint8_t g_cs_pin;
 
 #if (DEBUG == 1)
-extern volatile uint8_t g_debug_interrupt;
+extern volatile unsigned int g_debug_interrupt;
 #endif
 
 #endif

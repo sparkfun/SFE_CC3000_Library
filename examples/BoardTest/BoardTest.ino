@@ -41,7 +41,7 @@ SFE_CC3000 wifi = SFE_CC3000(CC3000_INT, CC3000_EN, CC3000_CS);
 void setup() {
   
   // Initialize Serial port
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.println();
   Serial.println("----------------------------");
   Serial.println("SparkFun CC3000 - Board Test");
@@ -51,6 +51,7 @@ void setup() {
   if ( !wifi.init() ) {
     Serial.println("Something went wrong during CC3000 init!");
   }
+  Serial.println("CC3000 initialization complete");
   
   // Read and display CC3000 firmware version
   

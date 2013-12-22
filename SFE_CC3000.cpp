@@ -29,7 +29,7 @@ uint8_t g_int_num;
 uint8_t g_en_pin;
 uint8_t g_cs_pin;
 #if (DEBUG == 1)
-volatile uint8_t g_debug_interrupt;
+volatile unsigned int g_debug_interrupt;
 #endif
  
  /**
@@ -50,7 +50,7 @@ SFE_CC3000::SFE_CC3000(uint8_t int_pin, uint8_t en_pin, uint8_t cs_pin)
     g_en_pin = en_pin;
     g_cs_pin = cs_pin;
 #if (DEBUG == 1)
-    g_debug_interrupt = 255;
+    g_debug_interrupt = 0xFFFF;
 #endif
 
 }

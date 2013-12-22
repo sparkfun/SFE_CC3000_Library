@@ -257,9 +257,6 @@ void wlan_init(		tWlanCB	 	sWlanCB,
 //*****************************************************************************
 void SpiReceiveHandler(void *pvBuffer)
 {	
-#if (DEBUG == 1)
-    g_debug_interrupt = 10;
-#endif
 	tSLInformation.usEventOrDataReceived = 1;
 	tSLInformation.pucReceivedData = (unsigned char 	*)pvBuffer;
 	
@@ -329,15 +326,9 @@ wlan_start(unsigned short usPatchesAvailableAtHost)
 	
 	if (ulSpiIRQState)
 	{
-#if (DEBUG == 1)
-        Serial.println("Waiting till IRQ line goes low...");
-#endif
 		// wait till the IRQ line goes low
 		while(tSLInformation.ReadWlanInterruptPin() != 0)
 		{
-#if (DEBUG == 1)
-        Serial.println("...");
-#endif
 		}
 	}
 	else
@@ -351,20 +342,14 @@ wlan_start(unsigned short usPatchesAvailableAtHost)
 		{
 		}
 	}
-    
-#if (DEBUG == 1)
-        Serial.println("Initializing SimpleLink");
-#endif
+
 	SimpleLink_Init_Start(usPatchesAvailableAtHost);
 	
 	// Read Buffer's size and finish
-#if (DEBUG == 1)
-        Serial.println("Sending HCI command: HCI_CMND_READ_BUFFER_SIZE");
-#endif
 	hci_command_send(HCI_CMND_READ_BUFFER_SIZE, tSLInformation.pucTxCommandBuffer, 0);
     
 #if (DEBUG == 1)
-        Serial.println("Waiting for command to finish...");
+        Serial.println("Waiting for SimpleLinkWaitEvent() to finish...");
 #endif
 	SimpleLinkWaitEvent(HCI_CMND_READ_BUFFER_SIZE, 0);
     

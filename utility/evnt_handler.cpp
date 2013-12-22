@@ -269,7 +269,6 @@ hci_event_handler(void *pRetParams, unsigned char *from, unsigned char *fromlen)
 	
 #if (DEBUG == 1)
     Serial.println("Event Handler: hci_event_handler()");
-    g_debug_interrupt = 255;
 #endif
 
 	while (1)
@@ -277,9 +276,8 @@ hci_event_handler(void *pRetParams, unsigned char *from, unsigned char *fromlen)
     
 #if (DEBUG == 1)
     Serial.print("g_debug_interrupt = ");
-    Serial.println(g_debug_interrupt);
-    Serial.print("usEventOrDataReceived = ");
-    Serial.println(tSLInformation.usEventOrDataReceived);
+    Serial.println(g_debug_interrupt, HEX);
+    g_debug_interrupt = 0xFFFF;
 #endif
 
 		if (tSLInformation.usEventOrDataReceived != 0)
@@ -549,6 +547,10 @@ hci_unsol_event_handler(char *event_hdr)
 	unsigned long NumberOfSentPackets;
 	
 	STREAM_TO_UINT16(event_hdr, HCI_EVENT_OPCODE_OFFSET,event_type);
+
+#if (DEBUG == 1)
+    g_debug_interrupt = event_type;
+#endif    
 	
 	if (event_type & HCI_EVNT_UNSOL_BASE)
 	{
@@ -568,9 +570,10 @@ hci_unsol_event_handler(char *event_hdr)
 					{
 						tSLInformation.sWlanCB(HCI_EVENT_CC3000_CAN_SHUT_DOWN, NULL, 0);
 					}
-				}				
+				}	   
+                
 				return 1;
-				
+                
 			}
 		}
 	}
@@ -656,6 +659,7 @@ hci_unsol_event_handler(char *event_hdr)
 		default: 
 			return (0);
 		}
+        
 		return(1);
 	}
 	
@@ -718,10 +722,6 @@ hci_unsolicited_event_handler(void)
 			// In case unsolicited event received - here the handling finished
 			if (hci_unsol_event_handler((char *)pucReceivedData) == 1)
 			{
-            
-#if (DEBUG == 1)
-    g_debug_interrupt = 12;
-#endif
 				// There was an unsolicited event received - we can release the buffer
 				// and clean the event received 
 				tSLInformation.usEventOrDataReceived = 0;

@@ -26,6 +26,7 @@
  */
 void cc3000AsyncCallback(long lEventType, char *data, unsigned char length)
 {
+
 	/*if (lEventType == HCI_EVNT_WLAN_ASYNC_SIMPLE_CONFIG_DONE)
 	{
 		ulSmartConfigFinished = 1;
