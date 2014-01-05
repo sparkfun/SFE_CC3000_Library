@@ -463,6 +463,7 @@ void SSIContReadOperation(void)
 	// The header was read - continue with  the payload read
 	if (!SpiReadDataCont())
 	{
+	
 		// All the data was read - finalize handling by switching to the task
 		//	and calling from task Event Handler
 		SpiTriggerRxProcessing();
@@ -526,7 +527,7 @@ void cc3000_ISR(void)
         // Wait for TX/RX Compete which will come as DMA interrupt
         SpiReadHeader();
         
-        sSpiInformation.ulSpiState = eSPI_STATE_READ_EOT;
+        sSpiInformation.ulSpiState = eSPI_STATE_READ_EOT; 
         
         SSIContReadOperation();
     }

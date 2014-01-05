@@ -19,6 +19,7 @@
 #include "SFE_CC3000.h"
 #include "SFE_CC3000_Callbacks.h"
 #include "SFE_CC3000_SPI.h"
+#include "utility/nvmem.h"
 #include "utility/wlan.h"
 
 #define SPI_CLK_DIV             SPI_CLOCK_DIV2        
@@ -126,15 +127,56 @@ bool SFE_CC3000::init()
                 disableWlanInterrupt,
                 writeWlanPin);
     
+    /* CC3000 needs a delay before starting WLAN or it gets stuck sometimes */
+    delay(100);
+    
     /* Start CC3000 - asserts enable pin and blocks until init is complete */
-#if (DEBUG == 1)
-    Serial.print("g_debug_interrupt = ");
-    Serial.println(g_debug_interrupt);
-#endif
     wlan_start(0);
     
     is_initialized_ = true;
 
+    return true;
+}
+
+/**
+ * @brief Reads the firmware version from the CC3000
+ *
+ * @param fw_ver firmware version in 2 bytes. [0] is major and [1] is minor
+ * @return True is firmware could be read from the CC3000. False otherwise.
+ */
+bool SFE_CC3000::getFirmwareVersion(unsigned char *fw_ver)
+{
+	/* If CC3000 is not initialized, return false. */
+	if (!is_initialized_) {
+        return false;
+    }
+	
+	/* Read firmware version from the CC3000 */
+	if (nvmem_read_sp_version(fw_ver) != CC3000_SUCCESS) {
+        return false;
+    }
+	
+	return true;
+}
+
+/**
+ * @brief Reads the MAC address from the CC3000
+ *
+ * @param mac_addr six char buffer containing the MAC address as a return value
+ * @return True if MAC address could be read from the CC3000. False otherwise.
+ */
+bool SFE_CC3000::getMacAddress(unsigned char *mac_addr)
+{
+	/* If CC3000 is not initialized, return false. */
+	if (!is_initialized_) {
+        return false;
+    }
+    
+    /* Read MAC address from the CC3000 */
+    if (nvmem_get_mac_address(mac_addr) != CC3000_SUCCESS) {
+        return false;
+    }
+    
     return true;
 }
 

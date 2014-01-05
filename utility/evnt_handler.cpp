@@ -273,15 +273,13 @@ hci_event_handler(void *pRetParams, unsigned char *from, unsigned char *fromlen)
 
 	while (1)
 	{
-    
-#if (DEBUG == 1)
-    Serial.print("g_debug_interrupt = ");
-    Serial.println(g_debug_interrupt, HEX);
-    g_debug_interrupt = 0xFFFF;
-#endif
-
 		if (tSLInformation.usEventOrDataReceived != 0)
-		{				
+		{		
+
+#if (DEBUG == 1)
+			Serial.println("usEventOrDataReceived");
+#endif
+		
 			pucReceivedData = (tSLInformation.pucReceivedData);
 
 			if (*pucReceivedData == HCI_TYPE_EVNT)
@@ -547,10 +545,6 @@ hci_unsol_event_handler(char *event_hdr)
 	unsigned long NumberOfSentPackets;
 	
 	STREAM_TO_UINT16(event_hdr, HCI_EVENT_OPCODE_OFFSET,event_type);
-
-#if (DEBUG == 1)
-    g_debug_interrupt = event_type;
-#endif    
 	
 	if (event_type & HCI_EVNT_UNSOL_BASE)
 	{
@@ -570,10 +564,9 @@ hci_unsol_event_handler(char *event_hdr)
 					{
 						tSLInformation.sWlanCB(HCI_EVENT_CC3000_CAN_SHUT_DOWN, NULL, 0);
 					}
-				}	   
-                
+				}				
 				return 1;
-                
+				
 			}
 		}
 	}
@@ -596,9 +589,8 @@ hci_unsol_event_handler(char *event_hdr)
 			
 		case HCI_EVNT_WLAN_UNSOL_DHCP:
 			{
-				unsigned char	params[NETAPP_IPCONFIG_MAC_OFFSET + 1];	// extra byte is for the status
-				unsigned char *recParams = params;
-				
+				tNetappDhcpParams params;
+				unsigned char *recParams = (unsigned char *)&params;			
 				data = (char*)(event_hdr) + HCI_EVENT_HEADER_SIZE;
 				
 				//Read IP address
@@ -615,13 +607,10 @@ hci_unsol_event_handler(char *event_hdr)
 				data += 4;
 				//Read DNS server  
 				STREAM_TO_STREAM(data,recParams,NETAPP_IPCONFIG_IP_LENGTH); 
-				// read the status
-				STREAM_TO_UINT8(event_hdr, HCI_EVENT_STATUS_OFFSET, *recParams);
-
-
+					
 				if( tSLInformation.sWlanCB )
 				{
-					tSLInformation.sWlanCB(event_type, (char *)params, sizeof(params));
+					tSLInformation.sWlanCB(event_type, (char *)&params, sizeof(params));
 				}
 			}
 			break;
@@ -644,13 +633,9 @@ hci_unsol_event_handler(char *event_hdr)
 			break;
 		case HCI_EVNT_BSD_TCP_CLOSE_WAIT:
 			{
-				data = (char *)(event_hdr) + HCI_EVENT_HEADER_SIZE;
 				if( tSLInformation.sWlanCB )
 				{
-					//data[0] represents the socket id, for which FIN was received by remote.
-					//Upon receiving this event, the user can close the socket, or else the 
-					//socket will be closded after inacvitity timeout (by default 60 seconds)
-					tSLInformation.sWlanCB(event_type, data, 1);
+					tSLInformation.sWlanCB(event_type, NULL, 0);
 				}
 			}
 			break;
@@ -659,37 +644,19 @@ hci_unsol_event_handler(char *event_hdr)
 		default: 
 			return (0);
 		}
-        
 		return(1);
 	}
 	
 	if ((event_type == HCI_EVNT_SEND) || (event_type == HCI_EVNT_SENDTO)
 			|| (event_type == HCI_EVNT_WRITE))
 	{
-                char *pArg;
-                long status;
-                
-                pArg = M_BSD_RESP_PARAMS_OFFSET(event_hdr);
-                STREAM_TO_UINT32(pArg, BSD_RSP_PARAMS_STATUS_OFFSET,status);
-                
-                if (ERROR_SOCKET_INACTIVE == status)
-                {
-                    // The only synchronous event that can come from SL device in form of 
-                    // command complete is "Command Complete" on data sent, in case SL device 
-                    // was unable to transmit
-                    STREAM_TO_UINT8(event_hdr, HCI_EVENT_STATUS_OFFSET, tSLInformation.slTransmitDataError);
-                    update_socket_active_status(M_BSD_RESP_PARAMS_OFFSET(event_hdr));
-                    
-                    return (1);
-                }
-                else
-                    return (0);
-	}
-	
-	//handle a case where unsolicited event arrived, but was not handled by any of the cases above
-	if ((event_type != tSLInformation.usRxEventOpcode) && (event_type != HCI_EVNT_PATCHES_REQ))
-	{
-		return(1);
+		// The only synchronous event that can come from SL device in form of 
+		// command complete is "Command Complete" on data sent, in case SL device 
+		// was unable to transmit
+		STREAM_TO_UINT8(event_hdr, HCI_EVENT_STATUS_OFFSET, tSLInformation.slTransmitDataError);
+		update_socket_active_status(M_BSD_RESP_PARAMS_OFFSET(event_hdr));
+		
+		return (1);
 	}
 	
 	return(0);
@@ -718,7 +685,7 @@ hci_unsolicited_event_handler(void)
 		pucReceivedData = (tSLInformation.pucReceivedData);
 
 		if (*pucReceivedData == HCI_TYPE_EVNT)
-		{			
+		{
 			// In case unsolicited event received - here the handling finished
 			if (hci_unsol_event_handler((char *)pucReceivedData) == 1)
 			{

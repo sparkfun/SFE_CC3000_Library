@@ -22,6 +22,8 @@ public:
     SFE_CC3000(uint8_t int_pin, uint8_t en_pin, uint8_t cs_pin);
     ~SFE_CC3000();
     bool init();
+	bool getFirmwareVersion(unsigned char *fw_ver);
+    bool getMacAddress(unsigned char *mac_addr);
     bool connect(const char *ssid, const char *password, uint8_t sec);
 private:
     bool is_initialized_;
