@@ -17,6 +17,19 @@
 
 #include <Arduino.h>
 
+typedef struct ScanResult {
+    uint32_t num_networks;
+    uint32_t scan_status;
+    unsigned is_valid : 1;
+    unsigned rssi : 7;
+    unsigned security_mode : 2;
+    unsigned ssid_length : 6;
+    uint16_t entry_time;
+    unsigned char ssid[32];
+    unsigned char bssid[6];
+} ScanResult;
+    
+
 class SFE_CC3000 {
 public:
     SFE_CC3000(uint8_t int_pin, uint8_t en_pin, uint8_t cs_pin);
