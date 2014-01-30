@@ -1,6 +1,6 @@
 /**
  * @file	common.h
- * @brief 	Global header file for the project containing definitions
+ * @brief 	Global header file for the project (for constant/global definitions)
  * @author	Shawn Hymel (SparkFun Electronics)
  * 
  * @copyright	This code is public domain but you buy me a beer if you use

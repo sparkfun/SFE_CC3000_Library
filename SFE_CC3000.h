@@ -17,6 +17,27 @@
 
 #include <Arduino.h>
 
+/* Clock definition for SPI */
+#define SPI_CLK_DIV             SPI_CLOCK_DIV2
+
+/* Constants for AP scanning */
+#define SCAN_MIN_DWELL_TIME     20              // Milliseconds
+#define SCAN_MAX_DWELL_TIME     30              // Milliseconds
+#define SCAN_NUM_PROBE_REQS     2
+#define SCAN_CHANNEL_MASK       0x7FF
+#define SCAN_RSSI_THRESHOLD     -80
+#define SCAN_NSR_THRESHOLD      0
+#define SCAN_DEFAULT_TX_POWER   205
+#define SCAN_NUM_CHANNELS       16
+#define SCAN_CHANNEL_TIMEOUT    2000            // Milliseconds
+#define BSSID_LENGTH            6
+
+/* WLAN security types */
+#define SEC_UNSECURED           0
+#define SEC_WEP                 1
+#define SEC_WPA                 2
+#define SEC_WPA2                3    
+
 typedef struct ScanResult {
     uint32_t num_networks;
     uint32_t scan_status;
@@ -28,7 +49,13 @@ typedef struct ScanResult {
     unsigned char ssid[32];
     unsigned char bssid[6];
 } ScanResult;
-    
+
+typedef struct AccessPointInfo {
+    unsigned int rssi;
+    unsigned int security_mode;
+    char ssid[32];
+    unsigned char bssid[6];
+} AccessPointInfo;
 
 class SFE_CC3000 {
 public:
@@ -37,9 +64,14 @@ public:
     bool init();
 	bool getFirmwareVersion(unsigned char *fw_ver);
     bool getMacAddress(unsigned char *mac_addr);
+    bool scanAccessPoints(unsigned int scan_time);
+    bool getNextAccessPoint(AccessPointInfo &ap_info);  
     bool connect(const char *ssid, const char *password, uint8_t sec);
 private:
     bool is_initialized_;
+    uint32_t num_access_points_;
+    uint32_t access_point_count_;
+    ScanResult ap_scan_result_;
 };
 
 #endif

@@ -22,8 +22,6 @@
 #include "utility/nvmem.h"
 #include "utility/wlan.h"
 
-#define SPI_CLK_DIV             SPI_CLOCK_DIV2        
-
 /* Global variables */
 uint8_t g_int_pin;
 uint8_t g_int_num;
@@ -42,9 +40,12 @@ volatile unsigned int g_debug_interrupt;
   */
 SFE_CC3000::SFE_CC3000(uint8_t int_pin, uint8_t en_pin, uint8_t cs_pin)
 {
-
     /* Set initialization state */
     is_initialized_ = false;
+    
+    /* Initialize access point scan variables */
+    num_access_points_ = 0;
+    access_point_count_ = 0;
 
     /* Set pin definitions */
     g_int_pin = int_pin;
@@ -53,7 +54,6 @@ SFE_CC3000::SFE_CC3000(uint8_t int_pin, uint8_t en_pin, uint8_t cs_pin)
 #if (DEBUG == 1)
     g_debug_interrupt = 0xFFFF;
 #endif
-
 }
 
 /**
@@ -71,7 +71,6 @@ SFE_CC3000::~SFE_CC3000()
  */
 bool SFE_CC3000::init()
 {
-
 #if (DEBUG == 1)
     Serial.println("Initializing CC3000");
 #endif
@@ -181,16 +180,133 @@ bool SFE_CC3000::getMacAddress(unsigned char *mac_addr)
 }
 
 /**
+ * @brief Scans area for access points. Blocks operation to allow for scan.
+ *
+ * To scan for APs, first call scanAccessPoints() with an appropriate scan time
+ * (recommended scan_time = 4000ms). Create an AccessPointInfo struct and pass
+ * that to getNextAccessPoint(). Continue to call getNextAccessPoint() until it
+ * returns false (there are no more APs to scan).
+ *
+ * @param scan_time time to scan networks in milliseconds
+ * @return True if scan succeeded. False otherwise.
+ */
+bool SFE_CC3000::scanAccessPoints(unsigned int scan_time)
+{
+    int i;
+    unsigned long channel_timeouts[SCAN_NUM_CHANNELS];
+    
+    /* If CC3000 is not initialized, return false. */
+	if (!is_initialized_) {
+        return false;
+    }
+    
+    /* Create channel interval list for AP scanning */
+    for (i = 0; i < SCAN_NUM_CHANNELS; i++) {
+        channel_timeouts[0] = SCAN_CHANNEL_TIMEOUT;
+    }
+    
+    /* Setup access point scan */
+    if (wlan_ioctl_set_scan_params( scan_time, 
+                                    SCAN_MIN_DWELL_TIME,
+                                    SCAN_MAX_DWELL_TIME,
+                                    SCAN_NUM_PROBE_REQS,
+                                    SCAN_CHANNEL_MASK,
+                                    SCAN_RSSI_THRESHOLD,
+                                    SCAN_NSR_THRESHOLD,
+                                    SCAN_DEFAULT_TX_POWER,
+                                    channel_timeouts ) != CC3000_SUCCESS) {
+        return false;
+    }
+
+    /* Wait for scan to complete */
+    delay(scan_time + 500);
+    
+    /* Re-initialize AP counters */
+    num_access_points_ = 0;
+    access_point_count_ = 0;
+    
+    /* Get first scan result in order to obtain the total number of APs */
+    if (wlan_ioctl_get_scan_results(0, (unsigned char *)&ap_scan_result_) != 
+                                                            CC3000_SUCCESS ){
+        return false;
+    }
+    num_access_points_ = ap_scan_result_.num_networks;
+    
+    /* Stop scan */
+    if (wlan_ioctl_set_scan_params( 0, 
+                                    SCAN_MIN_DWELL_TIME,
+                                    SCAN_MAX_DWELL_TIME,
+                                    SCAN_NUM_PROBE_REQS,
+                                    SCAN_CHANNEL_MASK,
+                                    SCAN_RSSI_THRESHOLD,
+                                    SCAN_NSR_THRESHOLD,
+                                    SCAN_DEFAULT_TX_POWER,
+                                    channel_timeouts ) != CC3000_SUCCESS) {
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * @brief Fills out AP info struct with next access data. 
+ *
+ * To scan for APs, first call scanAccessPoints() with an appropriate scan time
+ * (recommended scan_time = 4000ms). Create an AccessPointInfo struct and pass
+ * that to getNextAccessPoint(). Continue to call getNextAccessPoint() until it
+ * returns false (there are no more APs to scan).
+ *
+ * @param ap_info struct containing information about the next AP
+ * @return True if next AP obtained. False if no more APs available.
+ */
+bool SFE_CC3000::getNextAccessPoint(AccessPointInfo &ap_info)
+{
+   /* If CC3000 is not initialized, return false. */
+	if (!is_initialized_) {
+        return false;
+    }
+    
+    /* If results are invalid (e.g. no results), return false */
+    if (!ap_scan_result_.is_valid) {
+        return false;
+    }
+    
+    /* If we have exhausted all of the networks to list, return false */
+    if (access_point_count_ >= num_access_points_) {
+        return false;
+    }
+    
+    /* Fill out AP info with last AP surveyed */
+    ap_info.rssi = ap_scan_result_.rssi;
+    ap_info.security_mode = ap_scan_result_.security_mode;
+    strncpy(ap_info.ssid, 
+            (char *)ap_scan_result_.ssid, 
+            ap_scan_result_.ssid_length);
+    ap_info.ssid[ap_scan_result_.ssid_length] = '\0';
+    memcpy(ap_info.bssid, ap_scan_result_.bssid, BSSID_LENGTH);
+    
+    /* Get next set of results */
+    if (wlan_ioctl_get_scan_results(0, (unsigned char *)&ap_scan_result_) != 
+                                                            CC3000_SUCCESS ){
+        return false;
+    }
+    
+    /* Increment AP counter */
+    access_point_count_++;
+    
+    return true;
+}
+
+/**
  * @brief Connects to a WAP using the given SSID and password
  *
  * @param ssid the SSID for the wireless network
  * @param password ASCII password for the wireless network
  * @param sec type of security for the network
- *
  * @return True if connected to wireless network. False otherwise.
  */
 bool SFE_CC3000::connect(const char *ssid, const char *password, uint8_t sec)
 {
-    return true;
+    return false;
 }
 
