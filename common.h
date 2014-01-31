@@ -12,7 +12,7 @@
  
 /* Debug setting. Set to 0 for no debug output. Set to 1 for debug output
  * If you enable debugging, make sure you call Serial.begin()! */
-#define DEBUG 0
+#define DEBUG 1
 
 /* Define success and failure constants for CC3000 library functions. For
  * whatever reason, TI assigned 0 as success. */
@@ -23,6 +23,12 @@ extern uint8_t g_int_pin;
 extern uint8_t g_int_num;
 extern uint8_t g_en_pin;
 extern uint8_t g_cs_pin;
+extern volatile unsigned long ulSmartConfigFinished;
+extern volatile unsigned long ucStopSmartConfig;
+extern volatile unsigned long ulCC3000Connected;
+extern volatile unsigned long ulCC3000DHCP;
+extern volatile unsigned long ulCC3000DHCP_configured;
+extern volatile unsigned long OkToDoShutDown;
 
 #if (DEBUG == 1)
 extern volatile unsigned int g_debug_interrupt;

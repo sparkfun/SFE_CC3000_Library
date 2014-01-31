@@ -17,6 +17,8 @@
 
 #include <Arduino.h>
 
+#include "utility/wlan.h"                       // Needed for CC3000 #defines
+
 /* Clock definition for SPI */
 #define SPI_CLK_DIV             SPI_CLOCK_DIV2
 
@@ -32,12 +34,7 @@
 #define SCAN_CHANNEL_TIMEOUT    2000            // Milliseconds
 #define BSSID_LENGTH            6
 
-/* WLAN security types */
-#define SEC_UNSECURED           0
-#define SEC_WEP                 1
-#define SEC_WPA                 2
-#define SEC_WPA2                3    
-
+/* Struct for storing results from AP scan */
 typedef struct ScanResult {
     uint32_t num_networks;
     uint32_t scan_status;
@@ -50,6 +47,7 @@ typedef struct ScanResult {
     unsigned char bssid[6];
 } ScanResult;
 
+/* Struct for returning results to user from AP scan */
 typedef struct AccessPointInfo {
     unsigned int rssi;
     unsigned int security_mode;
@@ -57,6 +55,7 @@ typedef struct AccessPointInfo {
     unsigned char bssid[6];
 } AccessPointInfo;
 
+/* CC3000 class */
 class SFE_CC3000 {
 public:
     SFE_CC3000(uint8_t int_pin, uint8_t en_pin, uint8_t cs_pin);
@@ -66,7 +65,11 @@ public:
     bool getMacAddress(unsigned char *mac_addr);
     bool scanAccessPoints(unsigned int scan_time);
     bool getNextAccessPoint(AccessPointInfo &ap_info);  
-    bool connect(const char *ssid, const char *password, uint8_t sec);
+    bool connect(   char *ssid,  
+                    unsigned int security,
+                    char *password = NULL,
+                    unsigned int timeout = 0);
+    bool getDHCPStatus();
 private:
     bool is_initialized_;
     uint32_t num_access_points_;

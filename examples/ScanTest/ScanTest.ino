@@ -84,16 +84,16 @@ void setup() {
     Serial.println(ap_info.rssi, DEC);
     Serial.print("Security: ");
     switch(ap_info.security_mode) {
-      case SEC_UNSECURED:
+      case WLAN_SEC_UNSEC:
         Serial.println("Unsecured");
         break;
-      case SEC_WEP:
+      case WLAN_SEC_WEP:
         Serial.println("WEP");
         break;
-      case SEC_WPA:
+      case WLAN_SEC_WPA:
         Serial.println("WPA");
         break;
-      case SEC_WPA2:
+      case WLAN_SEC_WPA2:
         Serial.println("WPA2");
         break;
       default:

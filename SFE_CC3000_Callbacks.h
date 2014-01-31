@@ -14,6 +14,7 @@
 #ifndef SFE_CC3000_CALLBACKS_H
 #define SFE_CC3000_CALLBACKS_H
 
+/* Callback functions */
 void cc3000AsyncCallback(long lEventType, char * data, unsigned char length);
 char *sendFirmwarePatch(unsigned long *Length);
 char *sendDriverPatch(unsigned long *Length);

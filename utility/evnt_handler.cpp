@@ -25,6 +25,7 @@
  *      RetParams = (unsigned char *)pRetParams;
  *   to fix implicit cast    
  *   
+ * - Moved "Common Defines" section to .h file to be accessible by all
  */
 
 /*****************************************************************************
@@ -83,65 +84,6 @@
 #include "socket.h"
 #include "netapp.h"
 #include "../SFE_CC3000_SPI.h"
-
- 
-
-//*****************************************************************************
-//                  COMMON DEFINES
-//*****************************************************************************
-
-#define FLOW_CONTROL_EVENT_HANDLE_OFFSET		(0)
-#define FLOW_CONTROL_EVENT_BLOCK_MODE_OFFSET	(1)
-#define FLOW_CONTROL_EVENT_FREE_BUFFS_OFFSET	(2)
-#define FLOW_CONTROL_EVENT_SIZE					(4)
-
-#define BSD_RSP_PARAMS_SOCKET_OFFSET		(0)
-#define BSD_RSP_PARAMS_STATUS_OFFSET		(4)
-
-#define GET_HOST_BY_NAME_RETVAL_OFFSET	(0)
-#define GET_HOST_BY_NAME_ADDR_OFFSET	(4)
-
-#define ACCEPT_SD_OFFSET			(0)
-#define ACCEPT_RETURN_STATUS_OFFSET	(4)
-#define ACCEPT_ADDRESS__OFFSET		(8)
-
-#define SL_RECEIVE_SD_OFFSET			(0)
-#define SL_RECEIVE_NUM_BYTES_OFFSET		(4)
-#define SL_RECEIVE__FLAGS__OFFSET		(8)
-
-
-#define SELECT_STATUS_OFFSET			(0)
-#define SELECT_READFD_OFFSET			(4)
-#define SELECT_WRITEFD_OFFSET			(8)
-#define SELECT_EXFD_OFFSET				(12)
-
-
-#define NETAPP_IPCONFIG_IP_OFFSET				(0)
-#define NETAPP_IPCONFIG_SUBNET_OFFSET			(4)
-#define NETAPP_IPCONFIG_GW_OFFSET				(8)
-#define NETAPP_IPCONFIG_DHCP_OFFSET				(12)
-#define NETAPP_IPCONFIG_DNS_OFFSET				(16)
-#define NETAPP_IPCONFIG_MAC_OFFSET				(20)
-#define NETAPP_IPCONFIG_SSID_OFFSET				(26)
-
-#define NETAPP_IPCONFIG_IP_LENGTH				(4)
-#define NETAPP_IPCONFIG_MAC_LENGTH				(6)
-#define NETAPP_IPCONFIG_SSID_LENGTH				(32)
-
-
-#define NETAPP_PING_PACKETS_SENT_OFFSET			(0)
-#define NETAPP_PING_PACKETS_RCVD_OFFSET			(4)
-#define NETAPP_PING_MIN_RTT_OFFSET				(8)
-#define NETAPP_PING_MAX_RTT_OFFSET				(12)
-#define NETAPP_PING_AVG_RTT_OFFSET				(16)
-
-#define GET_SCAN_RESULTS_TABlE_COUNT_OFFSET				(0)
-#define GET_SCAN_RESULTS_SCANRESULT_STATUS_OFFSET		(4)
-#define GET_SCAN_RESULTS_ISVALID_TO_SSIDLEN_OFFSET		(8)
-#define GET_SCAN_RESULTS_FRAME_TIME_OFFSET				(10)
-#define GET_SCAN_RESULTS_SSID_MAC_LENGTH				(38)
-
-
 
 //*****************************************************************************
 //                  GLOBAL VARAIABLES

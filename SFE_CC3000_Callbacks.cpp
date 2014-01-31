@@ -16,6 +16,8 @@
 #include "common.h"
 #include "SFE_CC3000_Callbacks.h"
 #include "SFE_CC3000_SPI.h"
+#include "utility/evnt_handler.h"
+#include "utility/hci.h"
 
 /**
  * @brief   Asynchronous callback from CC3000 library - handles events
@@ -24,10 +26,11 @@
  * @param   data Pointer to the data
  * @param   length length of data
  */
-void cc3000AsyncCallback(long lEventType, char *data, unsigned char length)
+void cc3000AsyncCallback(long lEventType, char * data, unsigned char length)
 {
-
-	/*if (lEventType == HCI_EVNT_WLAN_ASYNC_SIMPLE_CONFIG_DONE)
+  
+  
+	if (lEventType == HCI_EVNT_WLAN_ASYNC_SIMPLE_CONFIG_DONE)
 	{
 		ulSmartConfigFinished = 1;
 		ucStopSmartConfig     = 1;  
@@ -36,19 +39,13 @@ void cc3000AsyncCallback(long lEventType, char *data, unsigned char length)
 	if (lEventType == HCI_EVNT_WLAN_UNSOL_CONNECT)
 	{
 		ulCC3000Connected = 1;
-		
-		// Turn on the LED1
-		turnLedOn(1);
 	}
 	
 	if (lEventType == HCI_EVNT_WLAN_UNSOL_DISCONNECT)
 	{		
 		ulCC3000Connected = 0;
 		ulCC3000DHCP      = 0;
-		ulCC3000DHCP_configured = 0;
-		printOnce = 1;
-		// Turn off the LED1
-		turnLedOff(1);                                     
+		ulCC3000DHCP_configured = 0;   
 	}
 	
 	if (lEventType == HCI_EVNT_WLAN_UNSOL_DHCP)
@@ -60,41 +57,18 @@ void cc3000AsyncCallback(long lEventType, char *data, unsigned char length)
 		// only if status is OK, the flag is set to 1 and the addresses are valid
 		if ( *(data + NETAPP_IPCONFIG_MAC_OFFSET) == 0)
 		{
-			char *ccPtr;
-			unsigned short ccLen;
-
-			pucCC3000_Rx_Buffer[0] = 'I';
-			pucCC3000_Rx_Buffer[1] = 'P';
-			pucCC3000_Rx_Buffer[2] = ':';
-
-			ccPtr = (char*)&pucCC3000_Rx_Buffer[3];
-
-			ccLen = itoa(data[3], ccPtr);
-			ccPtr += ccLen;
-			*ccPtr++ = '.';
-			ccLen = itoa(data[2], ccPtr);
-			ccPtr += ccLen;
-			*ccPtr++ = '.';
-			ccLen = itoa(data[1], ccPtr);
-			ccPtr += ccLen;
-			*ccPtr++ = '.';
-			ccLen = itoa(data[0], ccPtr);
-			ccPtr += ccLen;
-			*ccPtr++ = '\f';
-			*ccPtr++ = '\r';
-			*ccPtr++ = '\0';
-
 			ulCC3000DHCP = 1;
 		}
 		else
+		{
 			ulCC3000DHCP = 0;
-		
+		}
 	}
 	
 	if (lEventType == HCI_EVENT_CC3000_CAN_SHUT_DOWN)
 	{
 		OkToDoShutDown = 1;
-	}*/
+	}
 	
 }
 

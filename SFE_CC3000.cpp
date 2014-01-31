@@ -30,6 +30,12 @@ uint8_t g_cs_pin;
 #if (DEBUG == 1)
 volatile unsigned int g_debug_interrupt;
 #endif
+volatile unsigned long ulSmartConfigFinished;
+volatile unsigned long ucStopSmartConfig;
+volatile unsigned long ulCC3000Connected;
+volatile unsigned long ulCC3000DHCP;
+volatile unsigned long ulCC3000DHCP_configured;
+volatile unsigned long OkToDoShutDown;
  
  /**
   * @brief Constructor - Instantiates SFE_CC3000 object
@@ -54,6 +60,15 @@ SFE_CC3000::SFE_CC3000(uint8_t int_pin, uint8_t en_pin, uint8_t cs_pin)
 #if (DEBUG == 1)
     g_debug_interrupt = 0xFFFF;
 #endif
+    
+    /* Initialize status global variables */
+    ulSmartConfigFinished = 0;
+    ucStopSmartConfig = 0;
+    ulCC3000Connected = 0;
+    ulCC3000DHCP = 0;
+    ulCC3000DHCP_configured = 0;
+    OkToDoShutDown = 0;
+
 }
 
 /**
@@ -287,7 +302,7 @@ bool SFE_CC3000::getNextAccessPoint(AccessPointInfo &ap_info)
     
     /* Get next set of results */
     if (wlan_ioctl_get_scan_results(0, (unsigned char *)&ap_scan_result_) != 
-                                                            CC3000_SUCCESS ){
+                                                            CC3000_SUCCESS ) {
         return false;
     }
     
@@ -301,12 +316,114 @@ bool SFE_CC3000::getNextAccessPoint(AccessPointInfo &ap_info)
  * @brief Connects to a WAP using the given SSID and password
  *
  * @param ssid the SSID for the wireless network
- * @param password ASCII password for the wireless network
- * @param sec type of security for the network
+ * @param security type of security for the network
+ * @param password optional ASCII password if connecting to a secured AP
+ * @param timeout optional argument to set the timeout in ms. 0 = no timeout.
  * @return True if connected to wireless network. False otherwise.
  */
-bool SFE_CC3000::connect(const char *ssid, const char *password, uint8_t sec)
+bool SFE_CC3000::connect(   char *ssid, 
+                            unsigned int security, 
+                            char *password,
+                            unsigned int timeout)
 {
-    return false;
+
+    unsigned long time;
+
+    /* If CC3000 is not initialized, return false. */
+	if (!is_initialized_) {
+        return false;
+    }
+    
+    /* If already connected, return false. */
+    if (getDHCPStatus()) {
+        return false;
+    }
+    
+    /* If security mode is not a predefined type, return false. */
+    if ( !( security == WLAN_SEC_UNSEC ||
+            security == WLAN_SEC_WEP ||
+            security == WLAN_SEC_WPA ||
+            security == WLAN_SEC_WPA2) ) {
+        return false;
+    }
+    
+    /* Set connection profile to manual (no fast or auto connect) */
+    if (wlan_ioctl_set_connection_policy(0, 0, 0) != CC3000_SUCCESS) {
+        return false;
+    }
+    
+    /* Connect to the given access point*/
+    time = millis();
+    while (getDHCPStatus() == false) {
+    
+        /* Attempt to connect to an AP */
+        delay(10);
+        if (security == WLAN_SEC_UNSEC) {
+#if (DEBUG == 1)
+            Serial.println("Connecting to unsecured WiFi");
+#endif
+            if (wlan_connect(   WLAN_SEC_UNSEC, 
+                                ssid, 
+                                strlen(ssid), 
+                                0, 
+                                0, 
+                                0) == CC3000_SUCCESS) {
+                break;
+            }
+        } else {
+#if (DEBUG == 1)
+            Serial.println("Connecting to secured WiFi");
+#endif
+            if (wlan_connect(   security, 
+                                ssid, 
+                                strlen(ssid), 
+                                0, 
+                                (unsigned char*)password, 
+                                strlen(password)) == CC3000_SUCCESS) {
+                break;
+            }
+        }
+        
+        /* Check against timeout. Return if out of time. */
+        if (timeout != 0) {
+            if ( (millis() - time) > timeout ) {
+                return false;
+            }
+        }
+    }
+    
+#if (DEBUG == 1)
+    Serial.println("Waiting for DHCP");
+#endif
+    
+    /* Wait for DHCP */
+    while (getDHCPStatus() == false) {
+        if (timeout != 0) {
+            if ( (millis() - time) > timeout ) {
+#if (DEBUG == 1)
+                Serial.println("Error: Timed out (waiting for DHCP)");
+#endif
+                return false;
+            }
+        }
+    }
+    
+#if (DEBUG == 1)
+    Serial.println("DHCP Obtained");
+#endif
+
+    return true;
 }
 
+/**
+ * @brief Returns the status of DHCP
+ *
+ * @return True if DHCP has assigned an IP address. False otherwise.
+ */
+bool SFE_CC3000::getDHCPStatus() {
+    if (ulCC3000DHCP == 1) {
+        return true;
+    }
+    
+    return false;
+}
