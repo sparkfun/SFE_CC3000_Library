@@ -139,6 +139,11 @@ void setup() {
   }
   
   // Disconnect
+  if ( wifi.disconnect() ) {
+    Serial.println("Disconnected");
+  } else {
+    Serial.println("Error: Could not disconnect from network");
+  }
   
   // Done!
   Serial.println("Finished connection test");

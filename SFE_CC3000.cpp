@@ -419,6 +419,26 @@ bool SFE_CC3000::connect(   char *ssid,
 }
 
 /**
+ * @brief Disconnects from the AP
+ *
+ * @return True if disconnected successfully. False otherwise.
+ */
+bool SFE_CC3000::disconnect()
+{
+    /* If CC3000 is not initialized, return false. */
+	if (!is_initialized_) {
+        return false;
+    }
+    
+    /* Attempt to disconnect from the network */
+    if (wlan_disconnect() == CC3000_SUCCESS) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+/**
  * @brief Returns the status of DHCP
  *
  * @return True if DHCP has assigned an IP address. False otherwise.

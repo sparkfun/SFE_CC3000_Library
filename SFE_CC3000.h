@@ -81,6 +81,7 @@ public:
                     unsigned int security,
                     char *password = NULL,
                     unsigned int timeout = 0);
+    bool disconnect();
     bool getDHCPStatus();
     bool getConnectionStatus();
     bool getConnectionInfo(ConnectionInfo &info);
