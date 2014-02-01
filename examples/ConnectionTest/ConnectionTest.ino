@@ -42,9 +42,13 @@
 // IP address assignment method
 #define USE_DHCP        1   // 0 = static IP, 1 = DHCP
 
+// Connection info data lengths
+#define IP_ADDR_LEN     4   // Length of IP address in bytes
+#define MAC_ADDR_LEN    6   // Length of MAC address in bytes
+
 // Constants
-char ap_ssid[] = "CC3000Test";
-char ap_password[] = "sparkfun";
+char ap_ssid[] = "TDG";
+char ap_password[] = "97413quyrTTEW";
 unsigned int ap_security = WLAN_SEC_WPA2;
 unsigned int timeout = 30000;         // Milliseconds
 //const char static_ip_addr[] = "0.0.0.0";
@@ -55,6 +59,7 @@ SFE_CC3000 wifi = SFE_CC3000(CC3000_INT, CC3000_EN, CC3000_CS);
 void setup() {
   
   ConnectionInfo connection_info;
+  int i;
   
   // Initialize Serial port
   Serial.begin(115200);
@@ -72,7 +77,8 @@ void setup() {
 
 #if (USE_DHCP == 1)
   // Connect using DHCP
-  Serial.println("Connecting to AP");
+  Serial.print("Connecting to: ");
+  Serial.println(ap_ssid);
   if(!wifi.connect(ap_ssid, ap_security, ap_password, timeout)) {
     Serial.println("Error: Could not connect to AP");
   }
@@ -87,16 +93,52 @@ void setup() {
   } else {
     Serial.println("Connected!");
     Serial.println();
+    
+    // Print MAC address
+    Serial.print("CC3000 MAC Address: ");
+    for ( i = 0; i < MAC_ADDR_LEN; i++ ) {
+      if ( connection_info.mac_address[i] < 0x10 ) {
+        Serial.print("0");
+      }
+      Serial.print(connection_info.mac_address[i], HEX);
+      if ( i < MAC_ADDR_LEN - 1 ) {
+        Serial.print(":");
+      }
+    }
+    Serial.println();
+    
+    // Print IP Address
     Serial.print("IP Address: ");
-    Serial.print(connection_info.ip_address[3]);
-    Serial.print(".");
-    Serial.print(connection_info.ip_address[2]);
-    Serial.print(".");
-    Serial.print(connection_info.ip_address[1]);
-    Serial.print(".");
-    Serial.println(connection_info.ip_address[0]);
+    printIPAddr(connection_info.ip_address);
+    Serial.println();
+    
+    // Print subnet mask
+    Serial.print("Subnet Mask: ");
+    printIPAddr(connection_info.subnet_mask);
+    Serial.println();
+    
+    // Print default gateway
+    Serial.print("Default Gateway: ");
+    printIPAddr(connection_info.default_gateway);
+    Serial.println();
+    
+    // Print DHCP server address
+    Serial.print("DHCP Server: ");
+    printIPAddr(connection_info.dhcp_server);
+    Serial.println();
+    
+    // Print DNS server address
+    Serial.print("DNS Server: ");
+    printIPAddr(connection_info.dns_server);
+    Serial.println();
+    
+    // Print SSID
+    Serial.print("SSID: ");
+    Serial.println(connection_info.ssid);
     Serial.println();
   }
+  
+  // Disconnect
   
   // Done!
   Serial.println("Finished connection test");
@@ -108,4 +150,16 @@ void loop() {
   // Do nothing
   delay(1000);
   
+}
+
+// Print out an IP Address in human-readable format
+void printIPAddr(unsigned char ip_addr[]) {
+  int i;
+  
+  for (i = 0; i < IP_ADDR_LEN; i++) {
+    Serial.print(ip_addr[i]);
+    if ( i < IP_ADDR_LEN - 1 ) {
+      Serial.print(".");
+    }
+  }
 }

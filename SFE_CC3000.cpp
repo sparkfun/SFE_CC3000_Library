@@ -454,6 +454,9 @@ bool SFE_CC3000::getConnectionStatus()
  */
 bool SFE_CC3000::getConnectionInfo(ConnectionInfo &info) 
 {
+    uint8_t i;
+    uint8_t max;
+
     /* If CC3000 is not initialized, return false. */
 	if (!is_initialized_) {
         return false;
@@ -469,11 +472,44 @@ bool SFE_CC3000::getConnectionInfo(ConnectionInfo &info)
         return false;
     }
     
-    memcpy(info.ip_address, connection_info_.aucIP, 4);
-    memcpy(info.subnet_mask, connection_info_.aucSubnetMask, 4);
-    memcpy(info.dhcp_server, connection_info_.aucDHCPServer, 4);
-    memcpy(info.dns_server, connection_info_.aucDNSServer, 4);
-    memcpy(info.bssid, connection_info_.uaMacAddr, 6);
+    /* Copy IP address to return struct. Reverse byte order. */
+    max = sizeof(connection_info_.aucIP);
+    for (i = 0; i < max; i++) {
+        info.ip_address[i] = connection_info_.aucIP[max - 1 - i];
+    }
+
+    /* Copy subnet mask to return struct. Reverse byte order. */
+    max = sizeof(connection_info_.aucSubnetMask);
+    for (i = 0; i < max; i++) {
+        info.subnet_mask[i] = connection_info_.aucSubnetMask[max - 1 - i];
+    }
+    
+    /* Copy default gateway to return struct. Reverse byte order. */
+    max = sizeof(connection_info_.aucDefaultGateway);
+    for (i = 0; i < max; i++) {
+        info.default_gateway[i] = connection_info_.aucDefaultGateway[max - 
+                                                                        1 - i];
+    }
+    
+    /* Copy DHCP server address to return struct. Reverse byte order. */
+    max = sizeof(connection_info_.aucDHCPServer);
+    for (i = 0; i < max; i++) {
+        info.dhcp_server[i] = connection_info_.aucDHCPServer[max - 1 - i];
+    }
+    
+    /* Copy DNS server address to return struct. Reverse byte order. */
+    max = sizeof(connection_info_.aucDNSServer);
+    for (i = 0; i < max; i++) {
+        info.dns_server[i] = connection_info_.aucDNSServer[max - 1 - i];
+    }
+    
+    /* Copy MAC address to return struct. Reverse byte order. */
+    max = sizeof(connection_info_.uaMacAddr);
+    for (i = 0; i < max; i++) {
+        info.mac_address[i] = connection_info_.uaMacAddr[max - 1 - i];
+    }
+
+    /* Copy SSID to return struct. Keep byte order. */
     memcpy(info.ssid, connection_info_.uaSSID, 32);
     
     return true;

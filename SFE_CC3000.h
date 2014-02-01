@@ -60,9 +60,10 @@ typedef struct AccessPointInfo {
 typedef struct ConnectionInfo {
     unsigned char ip_address[4];
     unsigned char subnet_mask[4];
+    unsigned char default_gateway[4];
     unsigned char dhcp_server[4];
     unsigned char dns_server[4];
-    unsigned char bssid[6];
+    unsigned char mac_address[6];
     char ssid[32];
 } ConnectionInfo;
 

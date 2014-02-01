@@ -12,7 +12,7 @@
  
 /* Debug setting. Set to 0 for no debug output. Set to 1 for debug output
  * If you enable debugging, make sure you call Serial.begin()! */
-#define DEBUG 1
+#define DEBUG 0
 
 /* Define success and failure constants for CC3000 library functions. For
  * whatever reason, TI assigned 0 as success. */
