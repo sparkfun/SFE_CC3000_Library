@@ -43,16 +43,18 @@
 #define USE_DHCP        1   // 0 = static IP, 1 = DHCP
 
 // Constants
-char ap_ssid[] = "sparkfun";
-char ap_password[] = "sparkfun6175";
+char ap_ssid[] = "CC3000Test";
+char ap_password[] = "sparkfun";
 unsigned int ap_security = WLAN_SEC_WPA2;
-unsigned int timeout = 10000;         // Milliseconds
+unsigned int timeout = 30000;         // Milliseconds
 //const char static_ip_addr[] = "0.0.0.0";
 
 // Global Variables
 SFE_CC3000 wifi = SFE_CC3000(CC3000_INT, CC3000_EN, CC3000_CS);
 
 void setup() {
+  
+  ConnectionInfo connection_info;
   
   // Initialize Serial port
   Serial.begin(115200);
@@ -68,18 +70,33 @@ void setup() {
     Serial.println("Something went wrong during CC3000 init!");
   }
 
-  // Connect using DHCP
 #if (USE_DHCP == 1)
+  // Connect using DHCP
   Serial.println("Connecting to AP");
   if(!wifi.connect(ap_ssid, ap_security, ap_password, timeout)) {
-    Serial.println("Error connecting to AP");
+    Serial.println("Error: Could not connect to AP");
   }
-#endif
-
+#elif (USE_DHCP == 0)
   // Connect using static IP
-#if (USE_DHCP == 0)
   // ***TODO: Connect using static IP
 #endif
+
+  // Print out connection details
+  if( !wifi.getConnectionInfo(connection_info) ) {
+    Serial.println("Error: Could not obtain connection details");
+  } else {
+    Serial.println("Connected!");
+    Serial.println();
+    Serial.print("IP Address: ");
+    Serial.print(connection_info.ip_address[3]);
+    Serial.print(".");
+    Serial.print(connection_info.ip_address[2]);
+    Serial.print(".");
+    Serial.print(connection_info.ip_address[1]);
+    Serial.print(".");
+    Serial.println(connection_info.ip_address[0]);
+    Serial.println();
+  }
   
   // Done!
   Serial.println("Finished connection test");

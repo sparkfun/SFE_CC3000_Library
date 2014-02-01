@@ -19,6 +19,7 @@
 #include "SFE_CC3000.h"
 #include "SFE_CC3000_Callbacks.h"
 #include "SFE_CC3000_SPI.h"
+#include "utility/netapp.h"
 #include "utility/nvmem.h"
 #include "utility/wlan.h"
 
@@ -28,7 +29,7 @@ uint8_t g_int_num;
 uint8_t g_en_pin;
 uint8_t g_cs_pin;
 #if (DEBUG == 1)
-volatile unsigned int g_debug_interrupt;
+volatile long g_debug_interrupt;
 #endif
 volatile unsigned long ulSmartConfigFinished;
 volatile unsigned long ucStopSmartConfig;
@@ -52,14 +53,6 @@ SFE_CC3000::SFE_CC3000(uint8_t int_pin, uint8_t en_pin, uint8_t cs_pin)
     /* Initialize access point scan variables */
     num_access_points_ = 0;
     access_point_count_ = 0;
-
-    /* Set pin definitions */
-    g_int_pin = int_pin;
-    g_en_pin = en_pin;
-    g_cs_pin = cs_pin;
-#if (DEBUG == 1)
-    g_debug_interrupt = 0xFFFF;
-#endif
     
     /* Initialize status global variables */
     ulSmartConfigFinished = 0;
@@ -68,6 +61,14 @@ SFE_CC3000::SFE_CC3000(uint8_t int_pin, uint8_t en_pin, uint8_t cs_pin)
     ulCC3000DHCP = 0;
     ulCC3000DHCP_configured = 0;
     OkToDoShutDown = 0;
+
+    /* Set pin definitions */
+    g_int_pin = int_pin;
+    g_en_pin = en_pin;
+    g_cs_pin = cs_pin;
+#if (DEBUG == 1)
+    g_debug_interrupt = 0;
+#endif
 
 }
 
@@ -326,7 +327,6 @@ bool SFE_CC3000::connect(   char *ssid,
                             char *password,
                             unsigned int timeout)
 {
-
     unsigned long time;
 
     /* If CC3000 is not initialized, return false. */
@@ -354,7 +354,7 @@ bool SFE_CC3000::connect(   char *ssid,
     
     /* Connect to the given access point*/
     time = millis();
-    while (getDHCPStatus() == false) {
+    while (getConnectionStatus() == false) {
     
         /* Attempt to connect to an AP */
         delay(10);
@@ -409,8 +409,11 @@ bool SFE_CC3000::connect(   char *ssid,
     }
     
 #if (DEBUG == 1)
-    Serial.println("DHCP Obtained");
+    Serial.println("DHCP returned an address. Gathering connection data.");
 #endif
+
+    /* Get connection information */
+    netapp_ipconfig(&connection_info_);
 
     return true;
 }
@@ -420,10 +423,58 @@ bool SFE_CC3000::connect(   char *ssid,
  *
  * @return True if DHCP has assigned an IP address. False otherwise.
  */
-bool SFE_CC3000::getDHCPStatus() {
+bool SFE_CC3000::getDHCPStatus() 
+{
     if (ulCC3000DHCP == 1) {
         return true;
     }
     
     return false;
+}
+
+/**
+ * @brief Returns the status of connection to an access point
+ *
+ * @return True if connected. False otherwise.
+ */
+bool SFE_CC3000::getConnectionStatus() 
+{
+    if (ulCC3000Connected == 1) {
+        return true;
+    }
+    
+    return false;
+}
+
+/**
+ * @brief Fills out ConnectionInfo struct with AP connection details
+ *
+ * @param info struct containing information about the AP connection
+ * @return True if connection is valid. False otherwise.
+ */
+bool SFE_CC3000::getConnectionInfo(ConnectionInfo &info) 
+{
+    /* If CC3000 is not initialized, return false. */
+	if (!is_initialized_) {
+        return false;
+    }
+    
+    /* If not connected, return false. */
+    if (!getConnectionStatus()) {
+        return false;
+    }
+    
+    /* If DHCP has not been assigned, return false. */
+    if (!getDHCPStatus()) {
+        return false;
+    }
+    
+    memcpy(info.ip_address, connection_info_.aucIP, 4);
+    memcpy(info.subnet_mask, connection_info_.aucSubnetMask, 4);
+    memcpy(info.dhcp_server, connection_info_.aucDHCPServer, 4);
+    memcpy(info.dns_server, connection_info_.aucDNSServer, 4);
+    memcpy(info.bssid, connection_info_.uaMacAddr, 6);
+    memcpy(info.ssid, connection_info_.uaSSID, 32);
+    
+    return true;
 }

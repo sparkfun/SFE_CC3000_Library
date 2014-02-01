@@ -18,6 +18,7 @@
 #include <Arduino.h>
 
 #include "utility/wlan.h"                       // Needed for CC3000 #defines
+#include "utility/netapp.h"                     // Needed for struct types
 
 /* Clock definition for SPI */
 #define SPI_CLK_DIV             SPI_CLOCK_DIV2
@@ -55,6 +56,16 @@ typedef struct AccessPointInfo {
     unsigned char bssid[6];
 } AccessPointInfo;
 
+/* Struct for returning connection information to user */
+typedef struct ConnectionInfo {
+    unsigned char ip_address[4];
+    unsigned char subnet_mask[4];
+    unsigned char dhcp_server[4];
+    unsigned char dns_server[4];
+    unsigned char bssid[6];
+    char ssid[32];
+} ConnectionInfo;
+
 /* CC3000 class */
 class SFE_CC3000 {
 public:
@@ -70,11 +81,14 @@ public:
                     char *password = NULL,
                     unsigned int timeout = 0);
     bool getDHCPStatus();
+    bool getConnectionStatus();
+    bool getConnectionInfo(ConnectionInfo &info);
 private:
     bool is_initialized_;
     uint32_t num_access_points_;
     uint32_t access_point_count_;
     ScanResult ap_scan_result_;
+    tNetappIpconfigRetArgs connection_info_;
 };
 
 #endif

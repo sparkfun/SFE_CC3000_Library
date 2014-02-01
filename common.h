@@ -31,7 +31,7 @@ extern volatile unsigned long ulCC3000DHCP_configured;
 extern volatile unsigned long OkToDoShutDown;
 
 #if (DEBUG == 1)
-extern volatile unsigned int g_debug_interrupt;
+extern volatile long g_debug_interrupt;
 #endif
 
 #endif

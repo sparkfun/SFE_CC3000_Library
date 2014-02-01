@@ -29,7 +29,6 @@
 void cc3000AsyncCallback(long lEventType, char * data, unsigned char length)
 {
   
-  
 	if (lEventType == HCI_EVNT_WLAN_ASYNC_SIMPLE_CONFIG_DONE)
 	{
 		ulSmartConfigFinished = 1;
@@ -55,6 +54,9 @@ void cc3000AsyncCallback(long lEventType, char * data, unsigned char length)
 		// 2) IP config parameters are valid only if status is OK, i.e. ulCC3000DHCP becomes 1
 		
 		// only if status is OK, the flag is set to 1 and the addresses are valid
+#if (DEBUG == 1)
+        g_debug_interrupt = *(data + NETAPP_IPCONFIG_MAC_OFFSET);
+#endif
 		if ( *(data + NETAPP_IPCONFIG_MAC_OFFSET) == 0)
 		{
 			ulCC3000DHCP = 1;
