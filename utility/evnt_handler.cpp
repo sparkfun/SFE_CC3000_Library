@@ -1,6 +1,6 @@
 /**
  * @file	evnt_handler.cpp
- * @brief 	CC3000 library functions to handle asynchronous events
+ * @brief 	CC3000 library functions to handle a/synchronous events
  * @author	Texas Instruments
  * @author  Modified by Shawn Hymel (SparkFun Electronics)
  *
@@ -72,7 +72,6 @@
 //******************************************************************************
 //                  INCLUDE FILES
 //******************************************************************************
-
 #include <Arduino.h>
 #include "../common.h"
 
@@ -307,7 +306,7 @@ hci_event_handler(void *pRetParams, unsigned char *from, unsigned char *fromlen)
 						      ,GET_HOST_BY_NAME_RETVAL_OFFSET,*(unsigned long *)pRetParams);
 						pRetParams = ((char *)pRetParams) + 4;
 						STREAM_TO_UINT32((char *)pucReceivedParams
-									,GET_HOST_BY_NAME_ADDR_OFFSET,*(unsigned long *)pRetParams);					
+									,GET_HOST_BY_NAME_ADDR_OFFSET,*(unsigned long *)pRetParams);	
 						break;
 						
 					case HCI_EVNT_ACCEPT:

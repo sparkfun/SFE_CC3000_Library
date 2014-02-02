@@ -18,8 +18,6 @@
  *   changed to
  *      #include "../SFE_CC3000_SPI.h"
  *   to use Arduino's built-in SPI functions
- *
- * 
  */
 
 /*****************************************************************************

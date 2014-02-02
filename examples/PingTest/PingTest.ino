@@ -1,5 +1,5 @@
 /* 
- 01-30-2014
+ 02-01-2014
  SparkFun Electronics 2014
  Shawn Hymel
  
@@ -8,8 +8,12 @@
  
  Description:
  
- Connects to the access point given by the SSID and password.
- Pings the given website.
+ Connects to tha access point given by the SSID and password and
+ waits for a DHCP-assigned IP address. Pings the give website or
+ IP address and waits for a response.
+ 
+ The security mode is defined by one of the following:
+ WLAN_SEC_UNSEC, WLAN_SEC_WEP, WLAN_SEC_WPA, WLAN_SEC_WPA2
  
  Hardware Connections:
  
@@ -34,13 +38,113 @@
 #define CC3000_EN       7   // Can be any digital pin
 #define CC3000_CS       10  // Preferred is pin 10 on Uno
 
+// Connection info data lengths
+#define IP_ADDR_LEN     4   // Length of IP address in bytes
+
+// Constants
+char ap_ssid[] = "TDG";
+char ap_password[] = "97413quyrTTEW";
+unsigned int ap_security = WLAN_SEC_WPA2;
+unsigned int timeout = 30000;         // Milliseconds
+char remote_host[] = "www.sparkfun.com";
+
 // Global Variables
 SFE_CC3000 wifi = SFE_CC3000(CC3000_INT, CC3000_EN, CC3000_CS);
 
 void setup() {
   
+  ConnectionInfo connection_info;
+  IPAddr ip_addr;
+  PingReport ping_report;
+  int i;
+  
+  // Initialize Serial port
+  Serial.begin(115200);
+  Serial.println();
+  Serial.println("---------------------------");
+  Serial.println("SparkFun CC3000 - Ping Test");
+  Serial.println("---------------------------");
+  
+  // Initialize CC3000 (configure SPI communications)
+  if ( wifi.init() ) {
+    Serial.println("CC3000 initialization complete");
+  } else {
+    Serial.println("Something went wrong during CC3000 init!");
+  }
+
+  // Connect and wait for DHCP-assigned IP address
+  Serial.print("Connecting to: ");
+  Serial.println(ap_ssid);
+  if(!wifi.connect(ap_ssid, ap_security, ap_password, timeout)) {
+    Serial.println("Error: Could not connect to AP");
+  }
+  
+  // Gather connection details and print IP address
+  /*if ( !wifi.getConnectionInfo(connection_info) ) {
+    Serial.println("Error: Could not obtain connection details");
+  } else {
+    Serial.println("Connected!");
+    Serial.print("IP Address: ");
+    for (i = 0; i < IP_ADDR_LEN; i++) {
+      Serial.print(connection_info.ip_address[i]);
+      if ( i < IP_ADDR_LEN - 1 ) {
+        Serial.print(".");
+      }
+    }
+    Serial.println();
+  }*/
+  
+  // Perform a DNS lookup to get the IP address of a host
+  Serial.print("Looking up IP address of: ");
+  Serial.println(remote_host);
+  if ( !wifi.dnsLookup(remote_host, ip_addr) ) {
+    Serial.println("Error: Could not lookup host by name");
+  } else {
+    Serial.print("IP address found: ");
+    for (i = 0; i < IP_ADDR_LEN; i++) {
+      Serial.print(ip_addr.address[i]);
+      if ( i < IP_ADDR_LEN - 1 ) {
+        Serial.print(".");
+      }
+    }
+    Serial.println();
+  }
+  
+  // Ping IP address of remote host
+  Serial.println("Pinging remote host");
+  if ( !wifi.ping(ip_addr, ping_report, 3, 64, 1000) ) {
+    Serial.println("Error: no ping response");
+  } else {
+    Serial.println("Pong!");
+    Serial.println();
+    Serial.print("Packets sent: ");
+    Serial.println(ping_report.packets_sent);
+    Serial.print("Packets received: ");
+    Serial.println(ping_report.packets_received);
+    Serial.print("Min round time: ");
+    Serial.println(ping_report.min_round_time);
+    Serial.print("Max round time: ");
+    Serial.println(ping_report.max_round_time);
+    Serial.print("Avg round time: ");
+    Serial.println(ping_report.avg_round_time);
+    Serial.println();
+  }
+  
+  // Disconnect
+  if ( wifi.disconnect() ) {
+    Serial.println("Disconnected");
+  } else {
+    Serial.println("Error: Could not disconnect from network");
+  }
+  
+  // Done!
+  Serial.println("Finished ping test");
+  
 }
 
 void loop() {
+  
+  // Do nothing
+  delay(1000);
   
 }

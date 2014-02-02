@@ -1,3 +1,25 @@
+/**
+ * @file	socket.cpp
+ * @brief 	CC3000 library functions to handle socket connections over WiFi
+ * @author	Texas Instruments
+ * @author  Modified by Shawn Hymel (SparkFun Electronics)
+ *
+ * Changes to the original code are listed below:
+ * 
+ * - Changed file name from *.c to *.cpp to force the Arduino compiler to
+ *   treat it as a C++ file
+ *
+ * - Added the following to allow for debugging:
+ *      #include <Arduino.h>
+ *      #include "../common.h"
+ *
+ * - The line
+ *      SimpleLinkWaitData(buf, (unsigned char *)from, ...
+ *   changed to
+ *      SimpleLinkWaitData((unsigned char *)buf, (unsigned char *)from, ...
+ *   to avoid invalid conversion from 'void*' to 'unsigned char*'
+ */
+
 /*****************************************************************************
 *
 *  socket.c  - CC3000 Host Driver Implementation.
@@ -39,6 +61,8 @@
 //! @{
 //
 //*****************************************************************************
+#include <Arduino.h>
+#include "../common.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -473,6 +497,10 @@ gethostbyname(char * hostname, unsigned short usNameLen,
 	{
 		return errno;
 	}
+    
+#if (DEBUG == 1)
+    Serial.println("Performing lookup...");
+#endif
 	
 	ptr = tSLInformation.pucTxCommandBuffer;
 	args = (ptr + SIMPLE_LINK_HCI_CMND_TRANSPORT_HEADER_SIZE);
@@ -488,10 +516,17 @@ gethostbyname(char * hostname, unsigned short usNameLen,
 	
 	// Since we are in blocking state - wait for event complete
 	SimpleLinkWaitEvent(HCI_EVNT_BSD_GETHOSTBYNAME, &ret);
-	
+    
 	errno = ret.retVal;
 	
 	(*((long*)out_ip_addr)) = ret.outputAddress;
+    
+#if (DEBUG == 1)
+    Serial.print("...Done. retVal = ");
+    Serial.print(ret.retVal);
+    Serial.print(" IP Address = ");
+    Serial.println(ret.outputAddress, HEX);
+#endif
 	
 	return (errno);
 	
@@ -885,7 +920,7 @@ simple_link_recv(long sd, void *buf, long len, long flags, sockaddr *from,
 	{
 		// Wait for the data in a synchronous way. Here we assume that the bug is 
 		// big enough to store also parameters of receive from too....
-		SimpleLinkWaitData(buf, (unsigned char *)from, (unsigned char *)fromlen);
+		SimpleLinkWaitData((unsigned char *)buf, (unsigned char *)from, (unsigned char *)fromlen);
 	}
 	
 	errno = tSocketReadEvent.iNumberOfBytes;

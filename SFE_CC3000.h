@@ -48,7 +48,7 @@ typedef struct ScanResult {
     unsigned char bssid[6];
 } ScanResult;
 
-/* Struct for returning results to user from AP scan */
+/* Struct for returning results to the user from AP scan */
 typedef struct AccessPointInfo {
     unsigned int rssi;
     unsigned int security_mode;
@@ -56,7 +56,7 @@ typedef struct AccessPointInfo {
     unsigned char bssid[6];
 } AccessPointInfo;
 
-/* Struct for returning connection information to user */
+/* Struct for returning connection information to the user */
 typedef struct ConnectionInfo {
     unsigned char ip_address[4];
     unsigned char subnet_mask[4];
@@ -66,6 +66,14 @@ typedef struct ConnectionInfo {
     unsigned char mac_address[6];
     char ssid[32];
 } ConnectionInfo;
+
+/* Struct for returning ping reports to the user */
+typedef netapp_pingreport_args_t PingReport;
+
+/* Struct for holding a set-length IP address for the user */
+typedef struct IPAddr {
+    unsigned char address[4];
+} IPAddr;
 
 /* CC3000 class */
 class SFE_CC3000 {
@@ -82,6 +90,12 @@ public:
                     char *password = NULL,
                     unsigned int timeout = 0);
     bool disconnect();
+    bool dnsLookup(char *hostname, IPAddr &ip_address);
+    bool ping(  IPAddr &ip_address, 
+                PingReport ping_report,
+                unsigned int attempts = 1, 
+                unsigned int size = 56, 
+                unsigned int timeout = 1000);
     bool getDHCPStatus();
     bool getConnectionStatus();
     bool getConnectionInfo(ConnectionInfo &info);

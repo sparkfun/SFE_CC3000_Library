@@ -1,3 +1,22 @@
+/**
+ * @file	cc3000_common.cpp
+ * @brief 	Defines common functions/macros for the CC3000 library
+ * @author	Texas Instruments
+ * @author  Modified by Shawn Hymel (SparkFun Electronics)
+ *
+ * Changes to the original code are listed below:
+ * 
+ * - Changed file name from *.c to *.cpp to force the Arduino compiler to
+ *   treat it as a C++ file
+ *
+ * - Added the following to allow for debugging:
+ *      #include <Arduino.h>
+ *      #include "../common.h"
+ *
+ * - Changed return value of STREAM_TO_UINT32_f to a more explicit conversion
+ *   from a char[] to unsigned long
+ */
+
 /*****************************************************************************
 *
 *  cc3000_common.c.c  - CC3000 Host Driver Implementation.
@@ -43,6 +62,9 @@
  * Include files
  *
  *****************************************************************************/
+#include <Arduino.h>
+#include "../common.h"
+ 
 #include "cc3000_common.h"
 #include "socket.h"
 #include "wlan.h"
@@ -148,10 +170,33 @@ unsigned short STREAM_TO_UINT16_f(char* p, unsigned short offset)
 
 unsigned long STREAM_TO_UINT32_f(char* p, unsigned short offset)
 {
-        return (unsigned long)((unsigned long)((unsigned long)
-							 (*(p + offset + 3)) << 24) + (unsigned long)((unsigned long)
-							 (*(p + offset + 2)) << 16) + (unsigned long)((unsigned long)
-							 (*(p + offset + 1)) << 8) + (unsigned long)(*(p + offset)));
+
+#if (DEBUG == 1)
+    unsigned long dest = 0;
+
+    Serial.println("Macro: STREAM_TO_UINT32_f");
+    Serial.print("Stream to copy: ");
+    Serial.print((uint8_t)p[offset + 3], HEX);
+    Serial.print((uint8_t)p[offset + 2], HEX);
+    Serial.print((uint8_t)p[offset + 1], HEX);
+    Serial.println((uint8_t)p[offset], HEX);
+    dest = ((unsigned long)p[offset] & 0x000000FF) | 
+            (((unsigned long)p[offset + 1] << 8) & 0x0000FF00) |
+            (((unsigned long)p[offset + 2] << 16) & 0x00FF0000) |
+            (((unsigned long)p[offset + 3] << 24) & 0xFF000000);
+    Serial.print("Copied stream:  ");
+    Serial.println(dest, HEX);
+#endif
+
+    return ((unsigned long)p[offset] & 0x000000FF) | 
+            (((unsigned long)p[offset + 1] << 8) & 0x0000FF00) |
+            (((unsigned long)p[offset + 2] << 16) & 0x00FF0000) |
+            (((unsigned long)p[offset + 3] << 24) & 0xFF000000);
+
+    /*return (unsigned long)((unsigned long)((unsigned long)
+                         (*(p + offset + 3)) << 24) + (unsigned long)((unsigned long)
+                         (*(p + offset + 2)) << 16) + (unsigned long)((unsigned long)
+                         (*(p + offset + 1)) << 8) + (unsigned long)(*(p + offset)));*/
 }
 
 

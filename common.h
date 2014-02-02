@@ -12,11 +12,14 @@
  
 /* Debug setting. Set to 0 for no debug output. Set to 1 for debug output
  * If you enable debugging, make sure you call Serial.begin()! */
-#define DEBUG 0
+#define DEBUG 1
 
 /* Define success and failure constants for CC3000 library functions. For
  * whatever reason, TI assigned 0 as success. */
 #define CC3000_SUCCESS 0
+
+/* Includes needed for defined types */
+#include "utility/netapp.h"
 
 /* Global variable declarations */
 extern uint8_t g_int_pin;
@@ -29,6 +32,7 @@ extern volatile unsigned long ulCC3000Connected;
 extern volatile unsigned long ulCC3000DHCP;
 extern volatile unsigned long ulCC3000DHCP_configured;
 extern volatile unsigned long OkToDoShutDown;
+extern netapp_pingreport_args_t g_ping_report;
 
 #if (DEBUG == 1)
 extern volatile long g_debug_interrupt;

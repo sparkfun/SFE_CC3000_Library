@@ -1,3 +1,19 @@
+/**
+ * @file	netapp.cpp
+ * @brief 	CC3000 library functions to handle socket connections over WiFi
+ * @author	Texas Instruments
+ * @author  Modified by Shawn Hymel (SparkFun Electronics)
+ *
+ * Changes to the original code are listed below:
+ * 
+ * - Changed file name from *.c to *.cpp to force the Arduino compiler to
+ *   treat it as a C++ file
+ *
+ * - Added the following to allow for debugging:
+ *      #include <Arduino.h>
+ *      #include "../common.h"
+ */
+
 /*****************************************************************************
 *
 *  netapp.c  - CC3000 Host Driver Implementation.
@@ -32,6 +48,9 @@
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
+#include <Arduino.h>
+#include "../common.h"
+
 #include <string.h>
 #include "netapp.h"
 #include "hci.h"

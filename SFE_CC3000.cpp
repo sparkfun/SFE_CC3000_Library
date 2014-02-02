@@ -21,6 +21,7 @@
 #include "SFE_CC3000_SPI.h"
 #include "utility/netapp.h"
 #include "utility/nvmem.h"
+#include "utility/socket.h"
 #include "utility/wlan.h"
 
 /* Global variables */
@@ -37,13 +38,14 @@ volatile unsigned long ulCC3000Connected;
 volatile unsigned long ulCC3000DHCP;
 volatile unsigned long ulCC3000DHCP_configured;
 volatile unsigned long OkToDoShutDown;
+netapp_pingreport_args_t g_ping_report;
  
  /**
   * @brief Constructor - Instantiates SFE_CC3000 object
   *
-  * @param int_pin pin needed for MCU interrupt
-  * @param en_pin pin used for CC3000 enable
-  * @param cs_pin pin for SPI chip select
+  * @param[in] int_pin pin needed for MCU interrupt
+  * @param[in] en_pin pin used for CC3000 enable
+  * @param[in] cs_pin pin for SPI chip select
   */
 SFE_CC3000::SFE_CC3000(uint8_t int_pin, uint8_t en_pin, uint8_t cs_pin)
 {
@@ -156,7 +158,7 @@ bool SFE_CC3000::init()
 /**
  * @brief Reads the firmware version from the CC3000
  *
- * @param fw_ver firmware version in 2 bytes. [0] is major and [1] is minor
+ * @param[out] fw_ver firmware version in 2 bytes. [0] is major and [1] is minor
  * @return True is firmware could be read from the CC3000. False otherwise.
  */
 bool SFE_CC3000::getFirmwareVersion(unsigned char *fw_ver)
@@ -177,7 +179,7 @@ bool SFE_CC3000::getFirmwareVersion(unsigned char *fw_ver)
 /**
  * @brief Reads the MAC address from the CC3000
  *
- * @param mac_addr six char buffer containing the MAC address as a return value
+ * @param[out] mac_addr six char buffer containing the MAC address
  * @return True if MAC address could be read from the CC3000. False otherwise.
  */
 bool SFE_CC3000::getMacAddress(unsigned char *mac_addr)
@@ -203,7 +205,7 @@ bool SFE_CC3000::getMacAddress(unsigned char *mac_addr)
  * that to getNextAccessPoint(). Continue to call getNextAccessPoint() until it
  * returns false (there are no more APs to scan).
  *
- * @param scan_time time to scan networks in milliseconds
+ * @param[in] scan_time time to scan networks in milliseconds
  * @return True if scan succeeded. False otherwise.
  */
 bool SFE_CC3000::scanAccessPoints(unsigned int scan_time)
@@ -272,7 +274,7 @@ bool SFE_CC3000::scanAccessPoints(unsigned int scan_time)
  * that to getNextAccessPoint(). Continue to call getNextAccessPoint() until it
  * returns false (there are no more APs to scan).
  *
- * @param ap_info struct containing information about the next AP
+ * @param[out] ap_info struct containing information about the next AP
  * @return True if next AP obtained. False if no more APs available.
  */
 bool SFE_CC3000::getNextAccessPoint(AccessPointInfo &ap_info)
@@ -316,10 +318,10 @@ bool SFE_CC3000::getNextAccessPoint(AccessPointInfo &ap_info)
 /**
  * @brief Connects to a WAP using the given SSID and password
  *
- * @param ssid the SSID for the wireless network
- * @param security type of security for the network
- * @param password optional ASCII password if connecting to a secured AP
- * @param timeout optional argument to set the timeout in ms. 0 = no timeout.
+ * @param[in] ssid the SSID for the wireless network
+ * @param[in] security type of security for the network
+ * @param[in] password optional ASCII password if connecting to a secured AP
+ * @param[in] timeout optional argument to set the timeout in ms. 0 = no timeout
  * @return True if connected to wireless network. False otherwise.
  */
 bool SFE_CC3000::connect(   char *ssid, 
@@ -439,6 +441,102 @@ bool SFE_CC3000::disconnect()
 }
 
 /**
+ * @brief Looks up the IP address of a given hostname
+ *
+ * @param[in] hostname the name of the host or website (e.g. www.google.com)
+ * @param[out] ip_address returned IP address of the hostname
+ * @return True if lookup completed successfully. False otherwise.
+ */
+bool SFE_CC3000::dnsLookup(char *hostname, IPAddr &ip_address)
+{
+    unsigned long ret_ip_addr = 0;
+
+    /* If CC3000 is not initialized, return false. */
+	if (!is_initialized_) {
+        return false;
+    }
+    
+    /* If not connected, return false. */
+    if (!getConnectionStatus()) {
+        return false;
+    }
+    
+    /* If DHCP has not been assigned, return false. */
+    if (!getDHCPStatus()) {
+        return false;
+    }
+    
+#if (DEBUG == 1)
+    Serial.print("Looking up IP address for hostname. String length = ");
+    Serial.println(strlen(hostname), DEC);
+#endif
+
+    /* Attempt to get IP address by hostname */
+    if (!gethostbyname(hostname, strlen(hostname), &ret_ip_addr)) {
+        return false;
+    }
+    
+    /* Fill out return IP address value */
+    ip_address.address[3] = ret_ip_addr & 0xFF;
+    ip_address.address[2] = (ret_ip_addr >> 8) & 0xFF;
+    ip_address.address[1] = (ret_ip_addr >> 16) & 0xFF;
+    ip_address.address[0] = (ret_ip_addr >> 24) & 0xFF;
+
+    return true;
+}
+
+/**
+ * @brief Pings IP address [attempts] times and returns a ping report
+ *
+ * @param[in] ip_address the IP address to ping
+ * @param[out] ping_report returned ping report with statistics
+ * @param[in] attempts optional number of times to ping the address
+ * @param[in] size optional size of ping buffer (up to 1400 bytes)
+ * @param[in] timeout optional time to wait for ping response (milliseconds)
+ * @return True if ping command succeeded. False otherwise.
+ */
+bool SFE_CC3000::ping(  IPAddr &ip_address, 
+                        PingReport ping_report,
+                        unsigned int attempts, 
+                        unsigned int size, 
+                        unsigned int timeout)
+{
+    
+    unsigned long ip_addr;
+    
+    /* If CC3000 is not initialized, return false. */
+	if (!is_initialized_) {
+        return false;
+    }
+    
+    /* If not connected, return false. */
+    if (!getConnectionStatus()) {
+        return false;
+    }
+    
+    /* If DHCP has not been assigned, return false. */
+    if (!getDHCPStatus()) {
+        return false;
+    }
+    
+    /* Create unsigned long IP address out of char array */
+    ip_addr = ip_address.address[0] | 
+                (ip_address.address[1] << 8) |
+                (ip_address.address[2] << 16) |
+                (ip_address.address[3] << 32);
+                
+    /* Send pings and wait for report */
+    if (!netapp_ping_send(&ip_addr, attempts, size, timeout)) {
+        return false;
+    }
+    
+    /* Copy output of ping report to return sruct */
+    //ping_report = g_ping_report;
+    
+    return true;
+}
+
+/**
  * @brief Returns the status of DHCP
  *
  * @return True if DHCP has assigned an IP address. False otherwise.
@@ -447,9 +545,9 @@ bool SFE_CC3000::getDHCPStatus()
 {
     if (ulCC3000DHCP == 1) {
         return true;
+    } else {
+        return false;
     }
-    
-    return false;
 }
 
 /**
@@ -461,15 +559,15 @@ bool SFE_CC3000::getConnectionStatus()
 {
     if (ulCC3000Connected == 1) {
         return true;
+    } else {
+        return false;
     }
-    
-    return false;
 }
 
 /**
  * @brief Fills out ConnectionInfo struct with AP connection details
  *
- * @param info struct containing information about the AP connection
+ * @param[out] info struct containing information about the AP connection
  * @return True if connection is valid. False otherwise.
  */
 bool SFE_CC3000::getConnectionInfo(ConnectionInfo &info) 

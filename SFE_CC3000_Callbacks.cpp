@@ -71,6 +71,14 @@ void cc3000AsyncCallback(long lEventType, char * data, unsigned char length)
 	{
 		OkToDoShutDown = 1;
 	}
+    
+    /*if (lEventType == HCI_EVNT_WLAN_ASYNC_PING_REPORT) 
+    {
+#if (DEBUG == 1)
+    Serial.println("Ping report received");
+#endif
+        memcpy(&g_ping_report, data, length);
+    }*/
 	
 }
 
