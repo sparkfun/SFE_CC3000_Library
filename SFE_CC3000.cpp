@@ -38,7 +38,7 @@ volatile unsigned long ulCC3000Connected;
 volatile unsigned long ulCC3000DHCP;
 volatile unsigned long ulCC3000DHCP_configured;
 volatile unsigned long OkToDoShutDown;
-netapp_pingreport_args_t g_ping_report;
+netapp_pingreport_args_t g_ping_report = {0};
  
  /**
   * @brief Constructor - Instantiates SFE_CC3000 object
@@ -63,14 +63,14 @@ SFE_CC3000::SFE_CC3000(uint8_t int_pin, uint8_t en_pin, uint8_t cs_pin)
     ulCC3000DHCP = 0;
     ulCC3000DHCP_configured = 0;
     OkToDoShutDown = 0;
+#if (DEBUG == 1)
+    g_debug_interrupt = 0;
+#endif
 
     /* Set pin definitions */
     g_int_pin = int_pin;
     g_en_pin = en_pin;
     g_cs_pin = cs_pin;
-#if (DEBUG == 1)
-    g_debug_interrupt = 0;
-#endif
 
 }
 
@@ -496,7 +496,7 @@ bool SFE_CC3000::dnsLookup(char *hostname, IPAddr &ip_address)
  * @return True if ping command succeeded. False otherwise.
  */
 bool SFE_CC3000::ping(  IPAddr &ip_address, 
-                        PingReport ping_report,
+                        PingReport &ping_report,
                         unsigned int attempts, 
                         unsigned int size, 
                         unsigned int timeout)
@@ -520,18 +520,27 @@ bool SFE_CC3000::ping(  IPAddr &ip_address,
     }
     
     /* Create unsigned long IP address out of char array */
-    ip_addr = ip_address.address[0] | 
-                (ip_address.address[1] << 8) |
-                (ip_address.address[2] << 16) |
-                (ip_address.address[3] << 32);
+    ip_addr = (unsigned long)ip_address.address[0] | 
+                ((unsigned long)ip_address.address[1] << 8) |
+                ((unsigned long)ip_address.address[2] << 16) |
+                ((unsigned long)ip_address.address[3] << 24);
                 
     /* Send pings and wait for report */
-    if (!netapp_ping_send(&ip_addr, attempts, size, timeout)) {
+#if (DEBUG == 1)
+    Serial.print("Pinging 0x");
+    Serial.print(ip_addr, HEX);
+    Serial.println(" ...");
+#endif
+    if (netapp_ping_send(&ip_addr, attempts, size, timeout) != CC3000_SUCCESS) {
         return false;
     }
+    delay((timeout * attempts) * 2);
+#if (DEBUG == 1)
+    Serial.println("...Done");
+#endif
     
     /* Copy output of ping report to return sruct */
-    //ping_report = g_ping_report;
+    memcpy(&ping_report, &g_ping_report, sizeof(PingReport));
     
     return true;
 }

@@ -207,10 +207,6 @@ hci_event_handler(void *pRetParams, unsigned char *from, unsigned char *fromlen)
 	unsigned long retValue32;
     unsigned char * RecvParams;
     unsigned char *RetParams;
-	
-#if (DEBUG == 1)
-    Serial.println("Event Handler: hci_event_handler()");
-#endif
 
 	while (1)
 	{
@@ -236,7 +232,12 @@ hci_event_handler(void *pRetParams, unsigned char *from, unsigned char *fromlen)
 				if (hci_unsol_event_handler((char *)pucReceivedData) == 0)
 				{
 					STREAM_TO_UINT8(pucReceivedData, HCI_DATA_LENGTH_OFFSET, usLength);
-					
+                    
+#if (DEBUG == 1)
+			Serial.print("opcode = 0x");
+            Serial.println(usReceivedEventOpcode, HEX);
+#endif
+
 					switch(usReceivedEventOpcode)
 					{		
 					case HCI_CMND_READ_BUFFER_SIZE:
@@ -783,9 +784,6 @@ update_socket_active_status(char *resp_params)
 void 
 SimpleLinkWaitEvent(unsigned short usOpcode, void *pRetParams)
 {
-#if (DEBUG == 1)
-    Serial.println("Event Handler: SimpleLinkWaitEvent()");
-#endif
 	// In the blocking implementation the control to caller will be returned only 
 	// after the end of current transaction
 	tSLInformation.usRxEventOpcode = usOpcode;
@@ -812,9 +810,6 @@ void
 SimpleLinkWaitData(unsigned char *pBuf, unsigned char *from, 
 									 unsigned char *fromlen)
 {
-#if (DEBUG == 1)
-    Serial.println("Event Handler: SimpleLinkWaitData()");
-#endif
 	// In the blocking implementation the control to caller will be returned only 
 	// after the end of current transaction, i.e. only after data will be received
 	tSLInformation.usRxDataPending = 1;

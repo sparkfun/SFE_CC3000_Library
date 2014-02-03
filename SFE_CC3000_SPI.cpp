@@ -137,10 +137,6 @@ void SpiClose(void)
 //*****************************************************************************
 void SpiOpen(gcSpiHandleRx pfRxHandler)
 {
-#if (DEBUG == 1)
-    Serial.println("SPI: SpiOpen");
-#endif
-
     sSpiInformation.ulSpiState = eSPI_STATE_POWERUP;
 	sSpiInformation.SPIRxHandler = pfRxHandler;
 	sSpiInformation.usTxPacketLength = 0;

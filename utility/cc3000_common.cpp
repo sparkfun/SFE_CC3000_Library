@@ -171,7 +171,7 @@ unsigned short STREAM_TO_UINT16_f(char* p, unsigned short offset)
 unsigned long STREAM_TO_UINT32_f(char* p, unsigned short offset)
 {
 
-#if (DEBUG == 1)
+/*#if (DEBUG == 1)
     unsigned long dest = 0;
 
     Serial.println("Macro: STREAM_TO_UINT32_f");
@@ -186,7 +186,7 @@ unsigned long STREAM_TO_UINT32_f(char* p, unsigned short offset)
             (((unsigned long)p[offset + 3] << 24) & 0xFF000000);
     Serial.print("Copied stream:  ");
     Serial.println(dest, HEX);
-#endif
+#endif*/
 
     return ((unsigned long)p[offset] & 0x000000FF) | 
             (((unsigned long)p[offset + 1] << 8) & 0x0000FF00) |

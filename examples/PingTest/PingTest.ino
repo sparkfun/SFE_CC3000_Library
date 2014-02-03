@@ -42,11 +42,11 @@
 #define IP_ADDR_LEN     4   // Length of IP address in bytes
 
 // Constants
-char ap_ssid[] = "TDG";
-char ap_password[] = "97413quyrTTEW";
-unsigned int ap_security = WLAN_SEC_WPA2;
-unsigned int timeout = 30000;         // Milliseconds
-char remote_host[] = "www.sparkfun.com";
+char ap_ssid[] = "SSID";                  // SSID of network
+char ap_password[] = "PASSWORD";          // Password of network
+unsigned int ap_security = WLAN_SEC_WPA2; // Security of network
+unsigned int timeout = 30000;             // Milliseconds
+char remote_host[] = "www.sparkfun.com";  // Host to ping
 
 // Global Variables
 SFE_CC3000 wifi = SFE_CC3000(CC3000_INT, CC3000_EN, CC3000_CS);
@@ -55,7 +55,8 @@ void setup() {
   
   ConnectionInfo connection_info;
   IPAddr ip_addr;
-  PingReport ping_report;
+  IPAddr remote_ip;
+  PingReport ping_report = {0};
   int i;
   
   // Initialize Serial port
@@ -80,7 +81,7 @@ void setup() {
   }
   
   // Gather connection details and print IP address
-  /*if ( !wifi.getConnectionInfo(connection_info) ) {
+  if ( !wifi.getConnectionInfo(connection_info) ) {
     Serial.println("Error: Could not obtain connection details");
   } else {
     Serial.println("Connected!");
@@ -92,17 +93,17 @@ void setup() {
       }
     }
     Serial.println();
-  }*/
+  }
   
   // Perform a DNS lookup to get the IP address of a host
   Serial.print("Looking up IP address of: ");
   Serial.println(remote_host);
-  if ( !wifi.dnsLookup(remote_host, ip_addr) ) {
+  if ( !wifi.dnsLookup(remote_host, remote_ip) ) {
     Serial.println("Error: Could not lookup host by name");
   } else {
     Serial.print("IP address found: ");
     for (i = 0; i < IP_ADDR_LEN; i++) {
-      Serial.print(ip_addr.address[i]);
+      Serial.print(remote_ip.address[i], DEC);
       if ( i < IP_ADDR_LEN - 1 ) {
         Serial.print(".");
       }
@@ -111,8 +112,15 @@ void setup() {
   }
   
   // Ping IP address of remote host
-  Serial.println("Pinging remote host");
-  if ( !wifi.ping(ip_addr, ping_report, 3, 64, 1000) ) {
+  Serial.print("Pinging ");
+  for (i = 0; i < IP_ADDR_LEN; i++) {
+    Serial.print(remote_ip.address[i], DEC);
+    if ( i < IP_ADDR_LEN - 1 ) {
+      Serial.print(".");
+    }
+  }
+  Serial.println("...");
+  if ( !wifi.ping(remote_ip, ping_report, 3, 56, 1000) ) {
     Serial.println("Error: no ping response");
   } else {
     Serial.println("Pong!");
@@ -121,11 +129,11 @@ void setup() {
     Serial.println(ping_report.packets_sent);
     Serial.print("Packets received: ");
     Serial.println(ping_report.packets_received);
-    Serial.print("Min round time: ");
+    Serial.print("Min round time (ms): ");
     Serial.println(ping_report.min_round_time);
-    Serial.print("Max round time: ");
+    Serial.print("Max round time (ms): ");
     Serial.println(ping_report.max_round_time);
-    Serial.print("Avg round time: ");
+    Serial.print("Avg round time (ms): ");
     Serial.println(ping_report.avg_round_time);
     Serial.println();
   }

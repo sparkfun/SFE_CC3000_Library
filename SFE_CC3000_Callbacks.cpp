@@ -54,9 +54,6 @@ void cc3000AsyncCallback(long lEventType, char * data, unsigned char length)
 		// 2) IP config parameters are valid only if status is OK, i.e. ulCC3000DHCP becomes 1
 		
 		// only if status is OK, the flag is set to 1 and the addresses are valid
-#if (DEBUG == 1)
-        g_debug_interrupt = *(data + NETAPP_IPCONFIG_MAC_OFFSET);
-#endif
 		if ( *(data + NETAPP_IPCONFIG_MAC_OFFSET) == 0)
 		{
 			ulCC3000DHCP = 1;
@@ -72,13 +69,13 @@ void cc3000AsyncCallback(long lEventType, char * data, unsigned char length)
 		OkToDoShutDown = 1;
 	}
     
-    /*if (lEventType == HCI_EVNT_WLAN_ASYNC_PING_REPORT) 
+    if (lEventType == HCI_EVNT_WLAN_ASYNC_PING_REPORT) 
     {
 #if (DEBUG == 1)
     Serial.println("Ping report received");
 #endif
         memcpy(&g_ping_report, data, length);
-    }*/
+    }
 	
 }
 
@@ -142,9 +139,6 @@ long readWlanInterruptPin()
  */
 void enableWlanInterrupt()
 {
-#if (DEBUG == 1)
-    Serial.println("Callbacks: Enabling WLAN Interrupts");
-#endif
     attachInterrupt(g_int_num, cc3000_ISR, FALLING);
 }
 
@@ -153,9 +147,6 @@ void enableWlanInterrupt()
  */
 void disableWlanInterrupt()
 {
-#if (DEBUG == 1)
-    Serial.println("Callbacks: Disabling WLAN Interrupts");
-#endif
     detachInterrupt(g_int_num);
 }
 

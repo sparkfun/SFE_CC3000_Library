@@ -68,7 +68,14 @@ typedef struct ConnectionInfo {
 } ConnectionInfo;
 
 /* Struct for returning ping reports to the user */
-typedef netapp_pingreport_args_t PingReport;
+typedef struct PingReports
+{
+	unsigned long packets_sent;
+	unsigned long packets_received;
+	unsigned long min_round_time;
+	unsigned long max_round_time;
+	unsigned long avg_round_time;
+} PingReport;
 
 /* Struct for holding a set-length IP address for the user */
 typedef struct IPAddr {
@@ -92,7 +99,7 @@ public:
     bool disconnect();
     bool dnsLookup(char *hostname, IPAddr &ip_address);
     bool ping(  IPAddr &ip_address, 
-                PingReport ping_report,
+                PingReport &ping_report,
                 unsigned int attempts = 1, 
                 unsigned int size = 56, 
                 unsigned int timeout = 1000);

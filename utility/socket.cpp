@@ -497,10 +497,6 @@ gethostbyname(char * hostname, unsigned short usNameLen,
 	{
 		return errno;
 	}
-    
-#if (DEBUG == 1)
-    Serial.println("Performing lookup...");
-#endif
 	
 	ptr = tSLInformation.pucTxCommandBuffer;
 	args = (ptr + SIMPLE_LINK_HCI_CMND_TRANSPORT_HEADER_SIZE);
@@ -520,13 +516,6 @@ gethostbyname(char * hostname, unsigned short usNameLen,
 	errno = ret.retVal;
 	
 	(*((long*)out_ip_addr)) = ret.outputAddress;
-    
-#if (DEBUG == 1)
-    Serial.print("...Done. retVal = ");
-    Serial.print(ret.retVal);
-    Serial.print(" IP Address = ");
-    Serial.println(ret.outputAddress, HEX);
-#endif
 	
 	return (errno);
 	
