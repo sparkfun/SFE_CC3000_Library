@@ -1,5 +1,5 @@
 /* 
- 02-01-2014
+ 02-04-2014
  SparkFun Electronics 2014
  Shawn Hymel
  
@@ -8,12 +8,17 @@
  
  Description:
  
- Connects to the access point given by the SSID and password and
- waits for a DHCP-assigned IP address. Pings the give website or
- IP address and waits for a response.
+ Deletes any connection profiles stored in the CC3000 and starts
+ the SmartConfig procedure. During the SmartConfig wait time,
+ the user needs to open the TI SmartConfig app, fill out the
+ WiFi information and hit Start. If the configuration happens
+ successfully, the program will ping a remote host to verify
+ connection.
  
- The security mode is defined by one of the following:
- WLAN_SEC_UNSEC, WLAN_SEC_WEP, WLAN_SEC_WPA, WLAN_SEC_WPA2
+ Once a SmartConfig has been accomplished successfully, that
+ connection profile is stored in the CC3000's non-volatile 
+ memory. The user can run the FastConnect example to re-connect
+ to the same Access Point on boot.
  
  Hardware Connections:
  
@@ -30,7 +35,7 @@
  
  */
  
-#include <SPI.h>
+ #include <SPI.h>
 #include <SFE_CC3000.h>
 
 // Pins
@@ -42,9 +47,6 @@
 #define IP_ADDR_LEN     4   // Length of IP address in bytes
 
 // Constants
-char ap_ssid[] = "SSID";                  // SSID of network
-char ap_password[] = "PASSWORD";          // Password of network
-unsigned int ap_security = WLAN_SEC_WPA2; // Security of network
 unsigned int timeout = 30000;             // Milliseconds
 char remote_host[] = "www.sparkfun.com";  // Host to ping
 
@@ -62,9 +64,9 @@ void setup() {
   // Initialize Serial port
   Serial.begin(115200);
   Serial.println();
-  Serial.println("---------------------------");
-  Serial.println("SparkFun CC3000 - Ping Test");
-  Serial.println("---------------------------");
+  Serial.println("-----------------------------");
+  Serial.println("SparkFun CC3000 - SmartConfig");
+  Serial.println("-----------------------------");
   
   // Initialize CC3000 (configure SPI communications)
   if ( wifi.init() ) {
@@ -72,12 +74,13 @@ void setup() {
   } else {
     Serial.println("Something went wrong during CC3000 init!");
   }
-
-  // Connect and wait for DHCP-assigned IP address
-  Serial.print("Connecting to: ");
-  Serial.println(ap_ssid);
-  if(!wifi.connect(ap_ssid, ap_security, ap_password, timeout)) {
-    Serial.println("Error: Could not connect to AP");
+  
+  // Start SmartConfig and wait for IP address from DHCP
+  Serial.println("Starting SmartConfig");
+  Serial.println("Send connection details from app now!");
+  Serial.println("Waiting to connect...");
+  if ( !wifi.startSmartConfig(timeout) ) {
+    Serial.println("Error: Could not connect with SmartConfig");
   }
   
   // Gather connection details and print IP address

@@ -350,7 +350,8 @@ bool SFE_CC3000::connect(   char *ssid,
     }
     
     /* Set connection profile to manual (no fast or auto connect) */
-    if (wlan_ioctl_set_connection_policy(0, 0, 0) != CC3000_SUCCESS) {
+    if (wlan_ioctl_set_connection_policy(DISABLE, DISABLE, DISABLE) != 
+                                                            CC3000_SUCCESS) {
         return false;
     }
     
@@ -416,6 +417,96 @@ bool SFE_CC3000::connect(   char *ssid,
 
     /* Get connection information */
     netapp_ipconfig(&connection_info_);
+
+    return true;
+}
+
+/**
+ * @brief Begins SmartConfig. The user needs to run the SmartConfig phone app.
+ *
+ * @param[in] timeout the amount of time to wait before stopping the process
+ * @return True if connected to wireless network. False otherwise.
+ */
+bool SFE_CC3000::startSmartConfig(unsigned int timeout)
+{
+    char cc3000_prefix[] = {'T', 'T', 'T'};
+    unsigned long time;
+    
+    /* Reset all global connection variables */
+    ulSmartConfigFinished = 0;
+	ulCC3000Connected = 0;
+	ulCC3000DHCP = 0;
+	OkToDoShutDown=0;
+    
+    /* If CC3000 is not initialized, return false. */
+	if (!is_initialized_) {
+        return false;
+    }
+    
+    /* Set connection profile to manual (no fast or auto connect) */
+    if (wlan_ioctl_set_connection_policy(DISABLE, DISABLE, DISABLE) != 
+                                                            CC3000_SUCCESS) {
+        return false;
+    }
+    
+    /* Delete old connection profiles */
+    if (wlan_ioctl_del_profile(255) != CC3000_SUCCESS) {
+        return false;
+    }
+    
+    /* Wait until CC3000 is disconnected */
+    while (getConnectionStatus()) {
+        delay(1);
+    }
+    
+    /* Sets the prefix for SmartConfig. Should always be "TTT" */
+    if (wlan_smart_config_set_prefix((char*)cc3000_prefix) != CC3000_SUCCESS) {
+        return false;
+    }
+    
+    /* Start the SmartConfig process */
+    if (wlan_smart_config_start(0) != CC3000_SUCCESS) {
+        return false;
+    }
+    
+    /* Wait for SmartConfig to complete */
+    time = millis();
+    while (ulSmartConfigFinished == 0) {
+        if (timeout != 0) {
+            if ( (millis() - time) > timeout ) {
+#if (DEBUG == 1)
+                Serial.println("Error: Timed out (waiting for SmartConfig)");
+#endif
+                return false;
+            }
+        }
+    }
+    
+    /* Configure to connect automatically to AP from SmartConfig process */
+    if (wlan_ioctl_set_connection_policy(DISABLE, DISABLE, ENABLE) != 
+                                                            CC3000_SUCCESS) {
+        return false;
+    }
+    
+    /* Reset CC3000 */
+    wlan_stop();
+    delay(400);
+    wlan_start(0);
+    
+    /* Wait for connection and DHCP-assigned IP address */
+    while ((getDHCPStatus() == false) && (getConnectionStatus() == false)) {
+        if (timeout != 0) {
+            if ( (millis() - time) > timeout ) {
+#if (DEBUG == 1)
+                Serial.println("Error: Timed out (waiting for DHCP)");
+#endif
+                return false;
+            }
+        }
+    }
+    
+    /* If we make it this far, we need to tell the SmartConfig app to stop */
+    mdnsAdvertiser(1, DEVICE_NAME, strlen(DEVICE_NAME));
 
     return true;
 }

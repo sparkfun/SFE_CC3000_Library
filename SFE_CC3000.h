@@ -96,6 +96,7 @@ public:
                     unsigned int security,
                     char *password = NULL,
                     unsigned int timeout = 0);
+    bool startSmartConfig(unsigned int timeout = 3000);
     bool disconnect();
     bool dnsLookup(char *hostname, IPAddr &ip_address);
     bool ping(  IPAddr &ip_address, 

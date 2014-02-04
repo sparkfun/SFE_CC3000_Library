@@ -10,13 +10,20 @@
 #ifndef COMMON_H
 #define COMMON_H
  
+/* Sets the name of the device. Used by SmartConfig. */
+#define DEVICE_NAME     "CC3000"
+ 
 /* Debug setting. Set to 0 for no debug output. Set to 1 for debug output
  * If you enable debugging, make sure you call Serial.begin()! */
-#define DEBUG 0
+#define DEBUG           0
 
 /* Define success and failure constants for CC3000 library functions. For
  * whatever reason, TI assigned 0 as success. */
-#define CC3000_SUCCESS 0
+#define CC3000_SUCCESS  0
+
+/* Define other constants used by the CC3000 library */
+#define DISABLE         0
+#define ENABLE          1
 
 /* Includes needed for defined types */
 #include "utility/netapp.h"
