@@ -19,6 +19,7 @@
 #include "SFE_CC3000.h"
 #include "SFE_CC3000_Callbacks.h"
 #include "SFE_CC3000_SPI.h"
+#include "utility/hci.h"
 #include "utility/netapp.h"
 #include "utility/nvmem.h"
 #include "utility/socket.h"
@@ -149,6 +150,9 @@ bool SFE_CC3000::init()
     
     /* Start CC3000 - asserts enable pin and blocks until init is complete */
     wlan_start(0);
+    
+    /* Mask out non-required events */
+    wlan_set_event_mask(HCI_EVNT_WLAN_KEEPALIVE | HCI_EVNT_WLAN_UNSOL_INIT);
     
     is_initialized_ = true;
 
@@ -362,9 +366,7 @@ bool SFE_CC3000::connect(   char *ssid,
         /* Attempt to connect to an AP */
         delay(10);
         if (security == WLAN_SEC_UNSEC) {
-#if (DEBUG == 1)
-            Serial.println("Connecting to unsecured WiFi");
-#endif
+
             if (wlan_connect(   WLAN_SEC_UNSEC, 
                                 ssid, 
                                 strlen(ssid), 
@@ -374,9 +376,6 @@ bool SFE_CC3000::connect(   char *ssid,
                 break;
             }
         } else {
-#if (DEBUG == 1)
-            Serial.println("Connecting to secured WiFi");
-#endif
             if (wlan_connect(   security, 
                                 ssid, 
                                 strlen(ssid), 
@@ -395,10 +394,6 @@ bool SFE_CC3000::connect(   char *ssid,
         }
     }
     
-#if (DEBUG == 1)
-    Serial.println("Waiting for DHCP");
-#endif
-    
     /* Wait for DHCP */
     while (getDHCPStatus() == false) {
         if (timeout != 0) {
@@ -410,10 +405,6 @@ bool SFE_CC3000::connect(   char *ssid,
             }
         }
     }
-    
-#if (DEBUG == 1)
-    Serial.println("DHCP returned an address. Gathering connection data.");
-#endif
 
     /* Get connection information */
     netapp_ipconfig(&connection_info_);
@@ -494,7 +485,10 @@ bool SFE_CC3000::startSmartConfig(unsigned int timeout)
     wlan_start(0);
     
     /* Wait for connection and DHCP-assigned IP address */
-    while ((getDHCPStatus() == false) && (getConnectionStatus() == false)) {
+#if (DEBUG == 1)
+    Serial.println("Waiting for DHCP");
+#endif
+    while (getDHCPStatus() == false) {
         if (timeout != 0) {
             if ( (millis() - time) > timeout ) {
 #if (DEBUG == 1)
@@ -507,6 +501,9 @@ bool SFE_CC3000::startSmartConfig(unsigned int timeout)
     
     /* If we make it this far, we need to tell the SmartConfig app to stop */
     mdnsAdvertiser(1, DEVICE_NAME, strlen(DEVICE_NAME));
+    
+    /* Get connection information */
+    netapp_ipconfig(&connection_info_);
 
     return true;
 }
@@ -674,7 +671,7 @@ bool SFE_CC3000::getConnectionInfo(ConnectionInfo &info)
 {
     uint8_t i;
     uint8_t max;
-
+    
     /* If CC3000 is not initialized, return false. */
 	if (!is_initialized_) {
         return false;

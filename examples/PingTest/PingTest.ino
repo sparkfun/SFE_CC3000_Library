@@ -47,6 +47,7 @@ char ap_password[] = "PASSWORD";          // Password of network
 unsigned int ap_security = WLAN_SEC_WPA2; // Security of network
 unsigned int timeout = 30000;             // Milliseconds
 char remote_host[] = "www.sparkfun.com";  // Host to ping
+unsigned int num_pings = 3;    // Number of times to ping
 
 // Global Variables
 SFE_CC3000 wifi = SFE_CC3000(CC3000_INT, CC3000_EN, CC3000_CS);
@@ -119,7 +120,9 @@ void setup() {
       Serial.print(".");
     }
   }
-  Serial.println("...");
+  Serial.print(" ");
+  Serial.print(num_pings, DEC);
+  Serial.println(" times...");
   if ( !wifi.ping(remote_ip, ping_report, 3, 56, 1000) ) {
     Serial.println("Error: no ping response");
   } else {

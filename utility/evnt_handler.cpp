@@ -232,11 +232,6 @@ hci_event_handler(void *pRetParams, unsigned char *from, unsigned char *fromlen)
 				if (hci_unsol_event_handler((char *)pucReceivedData) == 0)
 				{
 					STREAM_TO_UINT8(pucReceivedData, HCI_DATA_LENGTH_OFFSET, usLength);
-                    
-#if (DEBUG == 1)
-			Serial.print("opcode = 0x");
-            Serial.println(usReceivedEventOpcode, HEX);
-#endif
 
 					switch(usReceivedEventOpcode)
 					{		
@@ -488,6 +483,10 @@ hci_unsol_event_handler(char *event_hdr)
 	
 	STREAM_TO_UINT16(event_hdr, HCI_EVENT_OPCODE_OFFSET,event_type);
 	
+#if (DEBUG == 1)
+    g_debug_interrupt = event_type;
+#endif
+    
 	if (event_type & HCI_EVNT_UNSOL_BASE)
 	{
 		switch(event_type)
