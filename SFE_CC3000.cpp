@@ -325,7 +325,7 @@ bool SFE_CC3000::getNextAccessPoint(AccessPointInfo &ap_info)
  * @param[in] ssid the SSID for the wireless network
  * @param[in] security type of security for the network
  * @param[in] password optional ASCII password if connecting to a secured AP
- * @param[in] timeout optional argument to set the timeout in ms. 0 = no timeout
+ * @param[in] timeout optional time (ms) to wait before stopping. 0 = no timeout
  * @return True if connected to wireless network. False otherwise.
  */
 bool SFE_CC3000::connect(   char *ssid, 
@@ -415,7 +415,7 @@ bool SFE_CC3000::connect(   char *ssid,
 /**
  * @brief Begins SmartConfig. The user needs to run the SmartConfig phone app.
  *
- * @param[in] timeout the amount of time to wait before stopping the process
+ * @param[in] timeout optional time (ms) to wait before stopping. 0 = no timeout
  * @return True if connected to wireless network. False otherwise.
  */
 bool SFE_CC3000::startSmartConfig(unsigned int timeout)
@@ -501,6 +501,59 @@ bool SFE_CC3000::startSmartConfig(unsigned int timeout)
     
     /* If we make it this far, we need to tell the SmartConfig app to stop */
     mdnsAdvertiser(1, DEVICE_NAME, strlen(DEVICE_NAME));
+    
+    /* Get connection information */
+    netapp_ipconfig(&connection_info_);
+
+    return true;
+}
+
+/**
+ * @brief Attempts to connect to network stored in memory.
+ *
+ * FastConnect attempts to connect to the WiFi network (AP) stored in non-
+ * volatile memory. The user needs to run SmartConfig first in order to create
+ * a network profile in memory before running FastConnect.
+ *
+ * @param[in] timeout optional time (ms) to wait before stopping. 0 = no timeout
+ * @return True if connected to wireless network. False otherwise.
+ */
+bool SFE_CC3000::fastConnect(unsigned int timeout)
+{
+    unsigned long time;
+    
+    /* Reset all global connection variables */
+    ulSmartConfigFinished = 0;
+	ulCC3000Connected = 0;
+	ulCC3000DHCP = 0;
+	OkToDoShutDown=0;
+    
+    /* If CC3000 is not initialized, return false. */
+	if (!is_initialized_) {
+        return false;
+    }
+    
+    /* Set connection profile to auto-connect */
+    if (wlan_ioctl_set_connection_policy(DISABLE, DISABLE, ENABLE) != 
+                                                            CC3000_SUCCESS) {
+        return false;
+    }
+
+    /* Wait for connection and DHCP-assigned IP address */
+    time = millis();
+#if (DEBUG == 1)
+    Serial.println("Waiting for DHCP");
+#endif
+    while (getDHCPStatus() == false) {
+        if (timeout != 0) {
+            if ( (millis() - time) > timeout ) {
+#if (DEBUG == 1)
+                Serial.println("Error: Timed out (waiting for DHCP)");
+#endif
+                return false;
+            }
+        }
+    }
     
     /* Get connection information */
     netapp_ipconfig(&connection_info_);

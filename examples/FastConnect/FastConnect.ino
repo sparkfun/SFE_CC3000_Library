@@ -1,26 +1,17 @@
-/* 
- 02-04-2014
- SparkFun Electronics 2014
- Shawn Hymel
- 
- This code is public domain but you buy me a beer if you use this 
- and we meet someday (Beerware license).
- 
- Description:
- 
- Deletes any connection profiles stored in the CC3000 and starts
- the SmartConfig procedure. During the SmartConfig wait time,
- the user needs to open the TI SmartConfig app, fill out the
- WiFi information and hit Start. If the configuration happens
- successfully, the program will ping a remote host to verify
- connection.
- 
- Once a SmartConfig has been accomplished successfully, that
- connection profile is stored in the CC3000's non-volatile 
- memory. The user can run the FastConnect example to re-connect
- to the same Access Point on boot.
- 
- Hardware Connections:
+/*
+FastConnect.ino
+FastConnect
+Shawn Hymel @ SparkFun Electronics
+March 1, 2014
+https://github.com/sparkfun/SFE_CC3000_Library
+
+Connects to the WiFi network profile stored in non-volatile
+memory. Performs a ping test to verify functionality.
+
+NOTE: You must run SmartConfig.ino prior to this sketch in order
+to setup a profile.
+
+Hardware Connections:
  
  Uno Pin    CC3000 Board    Function
  
@@ -32,9 +23,22 @@
  11         MOSI            SPI MOSI
  12         MISO            SPI MISO
  13         SCK             SPI Clock
- 
- */
- 
+
+Resources:
+Include SPI.h and SFE_CC3000.h
+
+Development environment specifics:
+Written in Arduino 1.0.5
+Tested with Arduino UNO R3
+
+This code is beerware; if you see me (or any other SparkFun 
+employee) at the local, and you've found our code helpful, please
+buy us a round!
+
+Distributed as-is; no warranty is given.
+
+*/
+
 #include <SPI.h>
 #include <SFE_CC3000.h>
 
@@ -66,7 +70,7 @@ void setup() {
   Serial.begin(115200);
   Serial.println();
   Serial.println("-----------------------------");
-  Serial.println("SparkFun CC3000 - SmartConfig");
+  Serial.println("SparkFun CC3000 - FastConnect");
   Serial.println("-----------------------------");
   
   // Initialize CC3000 (configure SPI communications)
@@ -76,19 +80,18 @@ void setup() {
     Serial.println("Something went wrong during CC3000 init!");
   }
   
-  // Start SmartConfig and wait for IP address from DHCP
-  Serial.println("Starting SmartConfig");
-  Serial.println("Send connection details from app now!");
-  Serial.println("Waiting to connect...");
-  if ( !wifi.startSmartConfig(timeout) ) {
-    Serial.println("Error: Could not connect with SmartConfig");
+  // Connect to WiFi network stored in non-volatile memory
+  Serial.println("Connecting to network stored in profile...");
+  if ( !wifi.fastConnect(timeout) ) {
+    Serial.println("Error: Could not connect to network");
   }
   
   // Gather connection details and print IP address
   if ( !wifi.getConnectionInfo(connection_info) ) {
     Serial.println("Error: Could not obtain connection details");
   } else {
-    Serial.println("Connected!");
+    Serial.print("Connected to: ");
+    Serial.println(connection_info.ssid);
     Serial.print("IP Address: ");
     for (i = 0; i < IP_ADDR_LEN; i++) {
       Serial.print(connection_info.ip_address[i]);
@@ -152,7 +155,7 @@ void setup() {
   }
   
   // Done!
-  Serial.println("Finished SmartConfig test");
+  Serial.println("Finished FastConnect test");
   
 }
 
