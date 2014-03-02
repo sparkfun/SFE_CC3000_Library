@@ -35,6 +35,8 @@ public:
     virtual size_t write(uint8_t c);
     virtual size_t write(const uint8_t *buf, size_t size);
     bool available();
+    int read();
+    int read(uint8_t *buf, size_t size);
     bool close();
     bool connected();
 private:

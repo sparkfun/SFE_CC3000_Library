@@ -54,7 +54,7 @@ char ap_ssid[] = "SSID";                  // SSID of network
 char ap_password[] = "PASSWORD";          // Password of network
 unsigned int ap_security = WLAN_SEC_WPA2; // Security of network
 unsigned int timeout = 30000;             // Milliseconds
-char server[] = "www.google.com";       // Remote host site
+char server[] = "www.sparkfun.com";       // Remote host site
 
 // Global Variables
 SFE_CC3000 wifi = SFE_CC3000(CC3000_INT, CC3000_EN, CC3000_CS);
@@ -108,17 +108,19 @@ void setup() {
   }
   
   // Make a HTTP GET request
-  client.println("GET /search?q=arduino HTTP/1.1");
-  client.println("Host: www.google.com");
+  client.println("GET /news/6 HTTP/1.1");
+  client.println("Host: www.sparkfun.com");
   client.println("Connection: close");
   client.println();
+  Serial.println();
 }
 
 void loop() {
   
   // If there are incoming bytes, print them
   if ( client.available() ) {
-    Serial.print("T");
+    char c = client.read();
+    Serial.print(c);
   }
   
   // If the server has disconnected, stop the client and wifi

@@ -206,6 +206,34 @@ bool SFE_CC3000_Client::available()
 }
 
 /**
+ * @brief reads 1 byte from the socket
+ *
+ * @return received data. -1 if no data is available
+ */
+int SFE_CC3000_Client::read()
+{
+    uint8_t b;
+    if (recv(socket_, &b, 1, 0) > 0) {
+        return b;
+    } else {
+        return -1;
+    }
+}
+
+/**
+ * @brief reads data from the socket
+ *
+ * @param[out] buf the buffer onto which the data is written
+ * @param[in] the length (in bytes) of the buffer
+ * @return number of bytes received. -1 if an error occurred
+ */
+int SFE_CC3000_Client::read(uint8_t *buf, size_t size)
+{
+    /* Note: Flags arg is not yet supported by TI library */
+    return recv(socket_, buf, size, 0);
+}
+
+/**
  * @brief Closes the socket
  *
  * @return True if socket closed successfully. False otherwise.
