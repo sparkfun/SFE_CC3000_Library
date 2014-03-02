@@ -168,7 +168,7 @@ bool SFE_CC3000::init()
 bool SFE_CC3000::getFirmwareVersion(unsigned char *fw_ver)
 {
 	/* If CC3000 is not initialized, return false. */
-	if (!is_initialized_) {
+	if (!getInitStatus()) {
         return false;
     }
 	
@@ -189,7 +189,7 @@ bool SFE_CC3000::getFirmwareVersion(unsigned char *fw_ver)
 bool SFE_CC3000::getMacAddress(unsigned char *mac_addr)
 {
 	/* If CC3000 is not initialized, return false. */
-	if (!is_initialized_) {
+	if (!getInitStatus()) {
         return false;
     }
     
@@ -218,7 +218,7 @@ bool SFE_CC3000::scanAccessPoints(unsigned int scan_time)
     unsigned long channel_timeouts[SCAN_NUM_CHANNELS];
     
     /* If CC3000 is not initialized, return false. */
-	if (!is_initialized_) {
+	if (!getInitStatus()) {
         return false;
     }
     
@@ -284,7 +284,7 @@ bool SFE_CC3000::scanAccessPoints(unsigned int scan_time)
 bool SFE_CC3000::getNextAccessPoint(AccessPointInfo &ap_info)
 {
    /* If CC3000 is not initialized, return false. */
-	if (!is_initialized_) {
+	if (!getInitStatus()) {
         return false;
     }
     
@@ -336,7 +336,7 @@ bool SFE_CC3000::connect(   char *ssid,
     unsigned long time;
 
     /* If CC3000 is not initialized, return false. */
-	if (!is_initialized_) {
+	if (!getInitStatus()) {
         return false;
     }
     
@@ -430,7 +430,7 @@ bool SFE_CC3000::startSmartConfig(unsigned int timeout)
 	OkToDoShutDown=0;
     
     /* If CC3000 is not initialized, return false. */
-	if (!is_initialized_) {
+	if (!getInitStatus()) {
         return false;
     }
     
@@ -529,7 +529,7 @@ bool SFE_CC3000::fastConnect(unsigned int timeout)
 	OkToDoShutDown=0;
     
     /* If CC3000 is not initialized, return false. */
-	if (!is_initialized_) {
+	if (!getInitStatus()) {
         return false;
     }
     
@@ -569,7 +569,7 @@ bool SFE_CC3000::fastConnect(unsigned int timeout)
 bool SFE_CC3000::disconnect()
 {
     /* If CC3000 is not initialized, return false. */
-	if (!is_initialized_) {
+	if (!getInitStatus()) {
         return false;
     }
     
@@ -593,7 +593,7 @@ bool SFE_CC3000::dnsLookup(char *hostname, IPAddr &ip_address)
     unsigned long ret_ip_addr = 0;
 
     /* If CC3000 is not initialized, return false. */
-	if (!is_initialized_) {
+	if (!getInitStatus()) {
         return false;
     }
     
@@ -646,7 +646,7 @@ bool SFE_CC3000::ping(  IPAddr &ip_address,
     unsigned long ip_addr;
     
     /* If CC3000 is not initialized, return false. */
-	if (!is_initialized_) {
+	if (!getInitStatus()) {
         return false;
     }
     
@@ -715,6 +715,16 @@ bool SFE_CC3000::getConnectionStatus()
 }
 
 /**
+ * @brief Returns the initialization state of the CC3000
+ *
+ * @return True if initialized. False otherwise.
+ */
+bool SFE_CC3000::getInitStatus() 
+{
+    return is_initialized_;
+}
+
+/**
  * @brief Fills out ConnectionInfo struct with AP connection details
  *
  * @param[out] info struct containing information about the AP connection
@@ -726,7 +736,7 @@ bool SFE_CC3000::getConnectionInfo(ConnectionInfo &info)
     uint8_t max;
     
     /* If CC3000 is not initialized, return false. */
-	if (!is_initialized_) {
+	if (!getInitStatus()) {
         return false;
     }
     

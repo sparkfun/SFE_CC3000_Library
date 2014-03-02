@@ -18,6 +18,8 @@
  *   changed to
  *      #include "../SFE_CC3000_SPI.h"
  *   to use Arduino's built-in SPI functions
+ *
+ * - Added connect_to_socket() function as a wrapper for connect()
  */
 
 /*****************************************************************************

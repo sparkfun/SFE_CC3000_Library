@@ -107,6 +107,7 @@ public:
                 unsigned int timeout = 1000);
     bool getDHCPStatus();
     bool getConnectionStatus();
+    bool getInitStatus();
     bool getConnectionInfo(ConnectionInfo &info);
 private:
     bool is_initialized_;

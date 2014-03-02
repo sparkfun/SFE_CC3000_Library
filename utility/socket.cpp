@@ -580,6 +580,26 @@ connect(long sd, const sockaddr *addr, long addrlen)
 	return((long)ret);
 }
 
+//*****************************************************************************
+//
+//! connect_to_socket
+//!
+//!  @param[in]   sd       socket descriptor (handle)         
+//!  @param[in]   addr     specifies the destination addr. On this version
+//!                        only AF_INET is supported.
+//!  @param[out]  addrlen  contains the size of the structure pointed to by addr    
+//!  @return  	On success, zero is returned. On error, -1 is returned
+//!
+//!  @brief  Wrapper function for connect()
+//!
+//!  @sa socket
+//
+//*****************************************************************************
+extern long connect_to_socket(long sd, const sockaddr *addr, long addrlen)
+{
+    return connect(sd, addr, addrlen);
+}
+
 
 //*****************************************************************************
 //

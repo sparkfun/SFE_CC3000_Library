@@ -24,6 +24,7 @@
 /* Define other constants used by the CC3000 library */
 #define DISABLE         0
 #define ENABLE          1
+#define IP_ADDR_LEN     4   // Length of IP address in bytes
 
 /* Includes needed for defined types */
 #include "utility/netapp.h"

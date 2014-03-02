@@ -1,3 +1,14 @@
+/**
+ * @file	evnt_handler.cpp
+ * @brief 	CC3000 library functions to handle WiFi networking
+ * @author	Texas Instruments
+ * @author  Modified by Shawn Hymel (SparkFun Electronics)
+ *
+ * Changes to the original code are listed below:
+ *
+ * - Added connect_to_socket() function as a wrapper for connect()
+ */
+
 /*****************************************************************************
 *
 *  socket.h  - CC3000 Host Driver Implementation.
@@ -376,6 +387,8 @@ extern int gethostbyname(char * hostname, unsigned short usNameLen, unsigned lon
 //
 //*****************************************************************************
 extern long connect(long sd, const sockaddr *addr, long addrlen);
+
+extern long connect_to_socket(long sd, const sockaddr *addr, long addrlen);
 
 //*****************************************************************************
 //
