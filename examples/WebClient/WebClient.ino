@@ -54,7 +54,7 @@ char ap_ssid[] = "SSID";                  // SSID of network
 char ap_password[] = "PASSWORD";          // Password of network
 unsigned int ap_security = WLAN_SEC_WPA2; // Security of network
 unsigned int timeout = 30000;             // Milliseconds
-char server[] = "www.sparkfun.com";       // Remote host site
+char server[] = "www.example.com";       // Remote host site
 
 // Global Variables
 SFE_CC3000 wifi = SFE_CC3000(CC3000_INT, CC3000_EN, CC3000_CS);
@@ -80,7 +80,7 @@ void setup() {
   }
   
   // Connect using DHCP
-  Serial.print("Connecting to: ");
+  Serial.print("Connecting to SSID: ");
   Serial.println(ap_ssid);
   if(!wifi.connect(ap_ssid, ap_security, ap_password, timeout)) {
     Serial.println("Error: Could not connect to AP");
@@ -108,8 +108,9 @@ void setup() {
   }
   
   // Make a HTTP GET request
-  client.println("GET /news/6 HTTP/1.1");
-  client.println("Host: www.sparkfun.com");
+  client.println("GET /index.html HTTP/1.1");
+  client.print("Host: ");
+  client.println(server);
   client.println("Connection: close");
   client.println();
   Serial.println();

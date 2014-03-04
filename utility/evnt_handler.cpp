@@ -212,10 +212,6 @@ hci_event_handler(void *pRetParams, unsigned char *from, unsigned char *fromlen)
 	{
 		if (tSLInformation.usEventOrDataReceived != 0)
 		{		
-
-#if (DEBUG == 1)
-			Serial.println("usEventOrDataReceived");
-#endif
 		
 			pucReceivedData = (tSLInformation.pucReceivedData);
 

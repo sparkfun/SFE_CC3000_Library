@@ -76,7 +76,14 @@ void cc3000AsyncCallback(long lEventType, char * data, unsigned char length)
 #endif
         memcpy(&g_ping_report, data, length);
     }
-	
+    if (lEventType == HCI_EVNT_BSD_TCP_CLOSE_WAIT)
+    {
+    
+#if (DEBUG == 1)
+        Serial.println("BSD TCP Close Wait event");
+#endif
+
+    }
 }
 
 /**
