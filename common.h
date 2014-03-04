@@ -34,6 +34,7 @@ extern uint8_t g_int_pin;
 extern uint8_t g_int_num;
 extern uint8_t g_en_pin;
 extern uint8_t g_cs_pin;
+extern bool g_socket_connected;
 extern volatile unsigned long ulSmartConfigFinished;
 extern volatile unsigned long ucStopSmartConfig;
 extern volatile unsigned long ulCC3000Connected;

@@ -1,24 +1,21 @@
-/* 
- 01-30-2014
- SparkFun Electronics 2014
- Shawn Hymel
- 
- This code is public domain but you buy me a beer if you use this 
- and we meet someday (Beerware license).
- 
- Description:
- 
- Connects to the access point given by the SSID and password and
- waits for a DHCP-assigned IP address. To use a static IP
- address, change the #define USE_DHCP from 1 to 0 and assign an
- IP address to static_ip_addr in the Constants section.
- 
- NOTE: Static IP is not working at this time.
- 
- The security mode is defined by one of the following:
- WLAN_SEC_UNSEC, WLAN_SEC_WEP, WLAN_SEC_WPA, WLAN_SEC_WPA2
- 
- Hardware Connections:
+/****************************************************************
+ConnectionTest.ino
+CC3000 Connection Test
+Shawn Hymel @ SparkFun Electronics
+January 30, 2014
+https://github.com/sparkfun/SFE_CC3000_Library
+
+Connects to the access point given by the SSID and password and
+waits for a DHCP-assigned IP address. To use a static IP
+address, change the #define USE_DHCP from 1 to 0 and assign an
+IP address to static_ip_addr in the Constants section.
+
+NOTE: Static IP is not working at this time.
+
+The security mode is defined by one of the following:
+WLAN_SEC_UNSEC, WLAN_SEC_WEP, WLAN_SEC_WPA, WLAN_SEC_WPA2
+
+Hardware Connections:
  
  Uno Pin    CC3000 Board    Function
  
@@ -30,8 +27,20 @@
  11         MOSI            SPI MOSI
  12         MISO            SPI MISO
  13         SCK             SPI Clock
- 
- */
+
+Resources:
+Include SPI.h and SFE_CC3000.h
+
+Development environment specifics:
+Written in Arduino 1.0.5
+Tested with Arduino UNO R3
+
+This code is beerware; if you see me (or any other SparkFun 
+employee) at the local, and you've found our code helpful, please
+buy us a round!
+
+Distributed as-is; no warranty is given.
+****************************************************************/
  
 #include <SPI.h>
 #include <SFE_CC3000.h>

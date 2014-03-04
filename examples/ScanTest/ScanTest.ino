@@ -1,18 +1,15 @@
-/* 
- 01-05-2014
- SparkFun Electronics 2014
- Shawn Hymel
- 
- This code is public domain but you buy me a beer if you use this 
- and we meet someday (Beerware license).
- 
- Description:
- 
- Performs a scan of all SSIDs as seen by the CC3000 and prints the
- access points' information to the Serial Monitor. No WiFi
- connections are made.
- 
- Hardware Connections:
+/****************************************************************
+ScanTest.ino
+CC3000 WiFi AP Scan Test
+Shawn Hymel @ SparkFun Electronics
+January 5, 2014
+https://github.com/sparkfun/SFE_CC3000_Library
+
+Performs a scan of all SSIDs as seen by the CC3000 and prints the
+access points' information to the Serial Monitor. No WiFi
+connections are made.
+
+Hardware Connections:
  
  Uno Pin    CC3000 Board    Function
  
@@ -24,9 +21,21 @@
  11         MOSI            SPI MOSI
  12         MISO            SPI MISO
  13         SCK             SPI Clock
- 
- */
- 
+
+Resources:
+Include SPI.h and SFE_CC3000.h
+
+Development environment specifics:
+Written in Arduino 1.0.5
+Tested with Arduino UNO R3
+
+This code is beerware; if you see me (or any other SparkFun 
+employee) at the local, and you've found our code helpful, please
+buy us a round!
+
+Distributed as-is; no warranty is given.
+****************************************************************/
+
 #include <SPI.h>
 #include <SFE_CC3000.h>
 

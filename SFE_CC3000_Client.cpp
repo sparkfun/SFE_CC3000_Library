@@ -122,11 +122,6 @@ bool SFE_CC3000_Client::connect(    IPAddr &ip_address,
     
 #if (DEBUG == 1)
     Serial.println("Connecting to socket");
-    for (int i = 0; i < 14; i++) {
-        Serial.print(dest_addr.sa_data[i], HEX);
-        Serial.print(" ");
-    }
-    Serial.println();
 #endif
     
     /* Attempt to make a connection with a remote socket */
@@ -175,17 +170,12 @@ size_t SFE_CC3000_Client::write(const uint8_t *buf, size_t size)
 /**
  * @brief Determines if data is available for reading
  *
- * @return True if socket contains data to be read. False otherwisel.
+ * @return True if socket contains data to be read. False otherwise.
  */
 bool SFE_CC3000_Client::available()
 {
     fd_set readsds;
     timeval timeout;
-
-    /* If socket does not have a connection, return false */
-    if (!connected()) {
-        return false;
-    }
 
     /* We need something in readsds to tell select() to watch read sockets */
     memset(&readsds, 1, sizeof(readsds));
@@ -240,13 +230,17 @@ int SFE_CC3000_Client::read(uint8_t *buf, size_t size)
  */
 bool SFE_CC3000_Client::close()
 {
-    if (closesocket(socket_) != CC3000_SUCCESS) {
-        socket_ = -1;
-        return false;
-    } else {
-        socket_ = -1;
-        return true;
-    }
+    long ret;
+
+    /* Attempt to close the socket and set connected state to false */
+#if (DEBUG == 1)
+    Serial.print("Closing socket: 0x");
+    Serial.println(socket_, HEX);
+#endif
+    ret = closesocket(socket_);
+    socket_ = -1;
+    g_socket_connected = false;
+    return (ret == CC3000_SUCCESS) ? true : false;
 }
 
 /**
@@ -256,10 +250,16 @@ bool SFE_CC3000_Client::close()
  */
 bool SFE_CC3000_Client::connected()
 {
+    /* If there is no socket, return false */
     if (socket_ == -1) {
         return false;
-    } else {
-        return true;
     }
+    
+    /* If the connection was closed and there is no data, return false */
+    if ((!g_socket_connected) && (!available())) {
+        return false;
+    }
+    
+    return true;
 }
     

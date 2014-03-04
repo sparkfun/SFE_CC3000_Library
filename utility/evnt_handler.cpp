@@ -24,6 +24,8 @@
  *   changed to
  *      RetParams = (unsigned char *)pRetParams;
  *   to fix implicit cast    
+ *
+ * - Added callback to user code in hci_event_handler() for HCI_EVNT_CONNECT
  *   
  * - Moved "Common Defines" section to .h file to be accessible by all
  */
@@ -273,7 +275,21 @@ hci_event_handler(void *pRetParams, unsigned char *from, unsigned char *fromlen)
 					case HCI_EVNT_BIND:
 					case HCI_CMND_LISTEN:
 					case HCI_EVNT_CLOSE_SOCKET:
+                        STREAM_TO_UINT32((char *)pucReceivedParams,0,
+                                            *(unsigned long *)pRetParams);
+						break;
 					case HCI_EVNT_CONNECT:
+#if (DEBUG == 1)
+                        Serial.println("Socket Connect Event");
+#endif
+                        STREAM_TO_UINT32((char *)pucReceivedParams,0,
+                                            *(unsigned long *)pRetParams);
+                                            
+                        if( tSLInformation.sWlanCB )
+                        {
+                            tSLInformation.sWlanCB(HCI_EVNT_CONNECT, 0, 0);
+                        }
+						break;
 					case HCI_EVNT_NVMEM_WRITE:
 						
 						STREAM_TO_UINT32((char *)pucReceivedParams,0,

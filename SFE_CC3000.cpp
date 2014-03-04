@@ -30,6 +30,7 @@ uint8_t g_int_pin;
 uint8_t g_int_num;
 uint8_t g_en_pin;
 uint8_t g_cs_pin;
+bool g_socket_connected;
 #if (DEBUG == 1)
 volatile long g_debug_interrupt;
 #endif
@@ -64,6 +65,7 @@ SFE_CC3000::SFE_CC3000(uint8_t int_pin, uint8_t en_pin, uint8_t cs_pin)
     ulCC3000DHCP = 0;
     ulCC3000DHCP_configured = 0;
     OkToDoShutDown = 0;
+    g_socket_connected = false;
 #if (DEBUG == 1)
     g_debug_interrupt = 0;
 #endif

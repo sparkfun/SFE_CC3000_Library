@@ -1,18 +1,15 @@
-/* 
- 11-26-14
- SparkFun Electronics 2013
- Shawn Hymel
- 
- This code is public domain but you buy me a beer if you use this 
- and we meet someday (Beerware license).
- 
- Description:
- 
- Performs an initialization and reads the CC3000's MAC address and
- firmware version. The MAC address and firmware version are
- displayed to the Serial Monitor. No WiFi connections are made.
- 
- Hardware Connections:
+/****************************************************************
+BoardTest.ino
+CC3000 Board Test
+Shawn Hymel @ SparkFun Electronics
+November 26, 2014
+https://github.com/sparkfun/SFE_CC3000_Library
+
+Performs an initialization and reads the CC3000's MAC address and
+firmware version. The MAC address and firmware version are
+displayed to the Serial Monitor. No WiFi connections are made.
+
+Hardware Connections:
  
  Uno Pin    CC3000 Board    Function
  
@@ -24,8 +21,20 @@
  11         MOSI            SPI MOSI
  12         MISO            SPI MISO
  13         SCK             SPI Clock
- 
- */
+
+Resources:
+Include SPI.h and SFE_CC3000.h
+
+Development environment specifics:
+Written in Arduino 1.0.5
+Tested with Arduino UNO R3
+
+This code is beerware; if you see me (or any other SparkFun 
+employee) at the local, and you've found our code helpful, please
+buy us a round!
+
+Distributed as-is; no warranty is given.
+****************************************************************/
  
 #include <SPI.h>
 #include <SFE_CC3000.h>

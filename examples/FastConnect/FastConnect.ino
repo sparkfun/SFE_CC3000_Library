@@ -1,6 +1,6 @@
-/*
+/****************************************************************
 FastConnect.ino
-FastConnect
+CC3000 FastConnect Test
 Shawn Hymel @ SparkFun Electronics
 March 1, 2014
 https://github.com/sparkfun/SFE_CC3000_Library
@@ -36,8 +36,7 @@ employee) at the local, and you've found our code helpful, please
 buy us a round!
 
 Distributed as-is; no warranty is given.
-
-*/
+****************************************************************/
 
 #include <SPI.h>
 #include <SFE_CC3000.h>

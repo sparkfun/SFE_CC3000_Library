@@ -71,18 +71,15 @@ void cc3000AsyncCallback(long lEventType, char * data, unsigned char length)
     
     if (lEventType == HCI_EVNT_WLAN_ASYNC_PING_REPORT) 
     {
-#if (DEBUG == 1)
-    Serial.println("Ping report received");
-#endif
         memcpy(&g_ping_report, data, length);
+    }
+    if(lEventType == HCI_EVNT_CONNECT)
+    {
+        g_socket_connected = true;
     }
     if (lEventType == HCI_EVNT_BSD_TCP_CLOSE_WAIT)
     {
-    
-#if (DEBUG == 1)
-        Serial.println("BSD TCP Close Wait event");
-#endif
-
+        g_socket_connected = false;
     }
 }
 

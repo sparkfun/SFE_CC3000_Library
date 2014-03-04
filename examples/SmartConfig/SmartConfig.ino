@@ -1,26 +1,28 @@
-/* 
- 02-04-2014
- SparkFun Electronics 2014
- Shawn Hymel
- 
- This code is public domain but you buy me a beer if you use this 
- and we meet someday (Beerware license).
- 
- Description:
- 
- Deletes any connection profiles stored in the CC3000 and starts
- the SmartConfig procedure. During the SmartConfig wait time,
- the user needs to open the TI SmartConfig app, fill out the
- WiFi information and hit Start. If the configuration happens
- successfully, the program will ping a remote host to verify
- connection.
- 
- Once a SmartConfig has been accomplished successfully, that
- connection profile is stored in the CC3000's non-volatile 
- memory. The user can run the FastConnect example to re-connect
- to the same Access Point on boot.
- 
- Hardware Connections:
+/****************************************************************
+SmartConfig.ino
+CC3000 SmartConfig
+Shawn Hymel @ SparkFun Electronics
+February 4, 2014
+https://github.com/sparkfun/SFE_CC3000_Library
+
+Deletes any connection profiles stored in the CC3000 and starts
+the SmartConfig procedure. During the SmartConfig wait time,
+the user needs to open the TI SmartConfig app, fill out the
+WiFi information and hit Start. If the configuration happens
+successfully, the program will ping a remote host to verify
+connection.
+
+NOTE: Sometimes, the smartphone app will report that the
+connection failed, but the CC3000 will have received the data
+successfully. Make sure to read the serial output to see if
+a connection was made.
+
+Once a SmartConfig has been accomplished successfully, that
+connection profile is stored in the CC3000's non-volatile 
+memory. The user can run the FastConnect example to re-connect
+to the same Access Point on boot.
+
+Hardware Connections:
  
  Uno Pin    CC3000 Board    Function
  
@@ -32,8 +34,20 @@
  11         MOSI            SPI MOSI
  12         MISO            SPI MISO
  13         SCK             SPI Clock
- 
- */
+
+Resources:
+Include SPI.h and SFE_CC3000.h
+
+Development environment specifics:
+Written in Arduino 1.0.5
+Tested with Arduino UNO R3
+
+This code is beerware; if you see me (or any other SparkFun 
+employee) at the local, and you've found our code helpful, please
+buy us a round!
+
+Distributed as-is; no warranty is given.
+****************************************************************/
  
 #include <SPI.h>
 #include <SFE_CC3000.h>

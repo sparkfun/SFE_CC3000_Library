@@ -1,6 +1,6 @@
-/*
+/****************************************************************
 WebClient.ino
-WebClient
+CC3000 WebClient Test
 Shawn Hymel @ SparkFun Electronics
 March 1, 2014
 https://github.com/sparkfun/SFE_CC3000_Library
@@ -23,7 +23,7 @@ Hardware Connections:
  13         SCK             SPI Clock
 
 Resources:
-Include SPI.h and SFE_CC3000.h
+Include SPI.h, SFE_CC3000.h, and SFE_CC3000_Client.h
 
 Development environment specifics:
 Written in Arduino 1.0.5
@@ -34,8 +34,7 @@ employee) at the local, and you've found our code helpful, please
 buy us a round!
 
 Distributed as-is; no warranty is given.
-
-*/
+****************************************************************/
 
 #include <SPI.h>
 #include <SFE_CC3000.h>
@@ -54,7 +53,7 @@ char ap_ssid[] = "SSID";                  // SSID of network
 char ap_password[] = "PASSWORD";          // Password of network
 unsigned int ap_security = WLAN_SEC_WPA2; // Security of network
 unsigned int timeout = 30000;             // Milliseconds
-char server[] = "www.example.com";       // Remote host site
+char server[] = "www.example.com";        // Remote host site
 
 // Global Variables
 SFE_CC3000 wifi = SFE_CC3000(CC3000_INT, CC3000_EN, CC3000_CS);
@@ -129,7 +128,7 @@ void loop() {
     Serial.println();
     
     // Close socket
-    if ( client.close() ) {
+    if ( !client.close() ) {
       Serial.println("Error: Could not close socket");
     }
     
