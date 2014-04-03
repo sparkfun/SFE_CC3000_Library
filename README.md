@@ -16,7 +16,7 @@ The following are known problems with the library and are being actively worked 
 Getting Started
 ---------------
 
-* Download the Git repository as a ZIP ("Download as ZIP" button)
+* Download the Git repository as a ZIP ("Download ZIP" button)
 * Unzip
 * Copy the entire directory (SFE_CC3000_Library) to <Arduino installation directory>/libraries
 * Open the Arduino program
@@ -29,7 +29,7 @@ Getting Started
 * Click "Upload"
 * Go to Tools -> Serial Monitor
 * Ensure the baud rate is set at 115200 baud
-* The program should connect and print out the HTML of [www.example.com](www.example.com)!
+* The program should connect and print out the HTML of [www.example.com](http://www.example.com)!
 
 Version History
 ---------------
