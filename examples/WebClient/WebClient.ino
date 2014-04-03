@@ -9,6 +9,9 @@ Manually connects to a WiFi network and performs an HTTP GET
 request on a web page. Prints the contents of the page to
 the serial console.
 
+The security mode is defined by one of the following:
+WLAN_SEC_UNSEC, WLAN_SEC_WEP, WLAN_SEC_WPA, WLAN_SEC_WPA2
+
 Hardware Connections:
  
  Uno Pin    CC3000 Board    Function

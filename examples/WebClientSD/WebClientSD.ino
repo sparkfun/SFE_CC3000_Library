@@ -5,12 +5,18 @@ Shawn Hymel @ SparkFun Electronics
 March 27, 2014
 https://github.com/sparkfun/SFE_CC3000_Library
 
+IMPORTANT: This example does not work at this time. It is used as
+a test of the SD and CC3000 libraries' compatibility.
+
 Manually connects to a WiFi network and performs an HTTP GET
 request on a web page. Saves the contents of the site to an SD
 card.
 
 IMPORTANT: SD cards use 3.3V logic, so a 5V - 3.3V level shifter
 is required if coming from a 5V Arduino.
+
+The security mode is defined by one of the following:
+WLAN_SEC_UNSEC, WLAN_SEC_WEP, WLAN_SEC_WPA, WLAN_SEC_WPA2
 
 Hardware Connections:
  
