@@ -60,17 +60,6 @@ bool SFE_CC3000_Client::connect(    char *hostname,
         return false;
     }
     
-#if (DEBUG == 1)
-    Serial.print("IP Address of remote host: ");
-    for (int i = 0; i < IP_ADDR_LEN; i++) {
-        Serial.print(remote_ip.address[i]);
-        if (i < IP_ADDR_LEN - 1) {
-            Serial.print(".");
-        }
-    }
-    Serial.println();
-#endif    
-    
     /* Connect to remote host using IP address */
     return connect(remote_ip, port, protocol);
 }
@@ -120,10 +109,6 @@ bool SFE_CC3000_Client::connect(    IPAddr &ip_address,
         dest_addr.sa_data[i] = 0;
     }
     
-#if (DEBUG == 1)
-    Serial.println("Connecting to socket");
-#endif
-    
     /* Attempt to make a connection with a remote socket */
     if (connect_to_socket(socket_, &dest_addr, sizeof(dest_addr)) != 
                                                         CC3000_SUCCESS) {
@@ -158,10 +143,6 @@ size_t SFE_CC3000_Client::write(const uint8_t *buf, size_t size)
     if (!connected()) {
         return 0;
     }
-
-#if (DEBUG == 1)
-    Serial.println("Writing data to socket");
-#endif
     
     /* Send buffer. Last parameter (flags) is not yet implemented by TI. */
     return send(socket_, buf, size, 0);
@@ -233,10 +214,6 @@ bool SFE_CC3000_Client::close()
     long ret;
 
     /* Attempt to close the socket and set connected state to false */
-#if (DEBUG == 1)
-    Serial.print("Closing socket: 0x");
-    Serial.println(socket_, HEX);
-#endif
     ret = closesocket(socket_);
     socket_ = -1;
     g_socket_connected = false;

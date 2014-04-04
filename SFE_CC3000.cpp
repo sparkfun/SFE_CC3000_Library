@@ -92,9 +92,6 @@ SFE_CC3000::~SFE_CC3000()
  */
 bool SFE_CC3000::init()
 {
-#if (DEBUG == 1)
-    Serial.println("Initializing CC3000");
-#endif
 
     /* Check if CC3000 SPI is already initialized */
     if (is_initialized_) {
@@ -400,9 +397,6 @@ bool SFE_CC3000::connect(   char *ssid,
     while (getDHCPStatus() == false) {
         if (timeout != 0) {
             if ( (millis() - time) > timeout ) {
-#if (DEBUG == 1)
-                Serial.println("Error: Timed out (waiting for DHCP)");
-#endif
                 return false;
             }
         }
@@ -467,9 +461,6 @@ bool SFE_CC3000::startSmartConfig(unsigned int timeout)
     while (ulSmartConfigFinished == 0) {
         if (timeout != 0) {
             if ( (millis() - time) > timeout ) {
-#if (DEBUG == 1)
-                Serial.println("Error: Timed out (waiting for SmartConfig)");
-#endif
                 return false;
             }
         }
@@ -487,15 +478,9 @@ bool SFE_CC3000::startSmartConfig(unsigned int timeout)
     wlan_start(0);
     
     /* Wait for connection and DHCP-assigned IP address */
-#if (DEBUG == 1)
-    Serial.println("Waiting for DHCP");
-#endif
     while (getDHCPStatus() == false) {
         if (timeout != 0) {
             if ( (millis() - time) > timeout ) {
-#if (DEBUG == 1)
-                Serial.println("Error: Timed out (waiting for DHCP)");
-#endif
                 return false;
             }
         }
@@ -543,15 +528,9 @@ bool SFE_CC3000::fastConnect(unsigned int timeout)
 
     /* Wait for connection and DHCP-assigned IP address */
     time = millis();
-#if (DEBUG == 1)
-    Serial.println("Waiting for DHCP");
-#endif
     while (getDHCPStatus() == false) {
         if (timeout != 0) {
             if ( (millis() - time) > timeout ) {
-#if (DEBUG == 1)
-                Serial.println("Error: Timed out (waiting for DHCP)");
-#endif
                 return false;
             }
         }
@@ -608,11 +587,6 @@ bool SFE_CC3000::dnsLookup(char *hostname, IPAddr &ip_address)
     if (!getDHCPStatus()) {
         return false;
     }
-    
-#if (DEBUG == 1)
-    Serial.print("Looking up IP address for hostname. String length = ");
-    Serial.println(strlen(hostname), DEC);
-#endif
 
     /* Attempt to get IP address by hostname */
     if (!gethostbyname(hostname, strlen(hostname), &ret_ip_addr)) {
@@ -669,18 +643,10 @@ bool SFE_CC3000::ping(  IPAddr &ip_address,
                 ((unsigned long)ip_address.address[3] << 24);
                 
     /* Send pings and wait for report */
-#if (DEBUG == 1)
-    Serial.print("Pinging 0x");
-    Serial.print(ip_addr, HEX);
-    Serial.println(" ...");
-#endif
     if (netapp_ping_send(&ip_addr, attempts, size, timeout) != CC3000_SUCCESS) {
         return false;
     }
     delay((timeout * attempts) * 2);
-#if (DEBUG == 1)
-    Serial.println("...Done");
-#endif
     
     /* Copy output of ping report to return sruct */
     memcpy(&ping_report, &g_ping_report, sizeof(PingReport));

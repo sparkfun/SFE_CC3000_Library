@@ -5,8 +5,13 @@ Shawn Hymel @ SparkFun Electronics
 March 27, 2014
 https://github.com/sparkfun/SFE_CC3000_Library
 
-IMPORTANT: This example does not work at this time. It is used as
+IMPORTANT: This example DOES NOT WORK at this time. It is used as
 a test of the SD and CC3000 libraries' compatibility.
+
+TODO:
+ - Add store/recover of SPI mode for every ASSERT and DEASSERT
+   in SFE_CC3000_SPI
+ - Add SD test code (init, store html to file, etc.)
 
 Manually connects to a WiFi network and performs an HTTP GET
 request on a web page. Saves the contents of the site to an SD
@@ -47,6 +52,9 @@ buy us a round!
 Distributed as-is; no warranty is given.
 ****************************************************************/
 
+//***TEST MEMORY
+#include <MemoryFree.h>
+
 #include <SD.h>
 #include <SPI.h>
 #include <SFE_CC3000.h>
@@ -79,29 +87,37 @@ void setup() {
   // Initialize Serial port
   Serial.begin(115200);
   Serial.println();
-  Serial.println("-----------------------------");
-  Serial.println("SparkFun CC3000 - WebClientSD");
-  Serial.println("-----------------------------");
+  Serial.println(F("-----------------------------"));
+  Serial.println(F("SparkFun CC3000 - WebClientSD"));
+  Serial.println(F("-----------------------------"));
+  
+  // ***TEST MEMORY
+  Serial.print(F("Free memory: "));
+  Serial.println(freeMemory());
+  
+  // ***TEST PINS - should be fixed with SD init
+  pinMode(8, OUTPUT);
+  digitalWrite(8, HIGH);
   
   // Initialize CC3000 (configure SPI communications)
   if ( wifi.init() ) {
-    Serial.println("CC3000 initialization complete");
+    Serial.println(F("CC3000 initialization complete"));
   } else {
-    Serial.println("Something went wrong during CC3000 init!");
+    Serial.println(F("Something went wrong during CC3000 init!"));
   }
   
   // Connect using DHCP
-  Serial.print("Connecting to SSID: ");
+  Serial.print(F("Connecting to SSID: "));
   Serial.println(ap_ssid);
   if(!wifi.connect(ap_ssid, ap_security, ap_password, timeout)) {
-    Serial.println("Error: Could not connect to AP");
+    Serial.println(F("Error: Could not connect to AP"));
   }
   
   // Gather connection details and print IP address
   if ( !wifi.getConnectionInfo(connection_info) ) {
-    Serial.println("Error: Could not obtain connection details");
+    Serial.println(F("Error: Could not get connection details"));
   } else {
-    Serial.print("IP Address: ");
+    Serial.print(F("IP Address: "));
     for (i = 0; i < IP_ADDR_LEN; i++) {
       Serial.print(connection_info.ip_address[i]);
       if ( i < IP_ADDR_LEN - 1 ) {
@@ -112,17 +128,17 @@ void setup() {
   }
   
   // Make a TCP connection to remote host
-  Serial.print("Performing HTTP GET of: ");
+  Serial.print(F("Performing HTTP GET of: "));
   Serial.println(server);
   if ( !client.connect(server, 80, TCP) ) {
-    Serial.println("Error: Could not make a TCP connection");
+    Serial.println(F("Error: Could not make a TCP connection"));
   }
   
   // Make a HTTP GET request
-  client.println("GET /index.html HTTP/1.1");
-  client.print("Host: ");
+  client.println(F("GET /index.html HTTP/1.1"));
+  client.print(F("Host: "));
   client.println(server);
-  client.println("Connection: close");
+  client.println(F("Connection: close"));
   client.println();
   Serial.println();
 }
@@ -141,16 +157,17 @@ void loop() {
     
     // Close socket
     if ( !client.close() ) {
-      Serial.println("Error: Could not close socket");
+      Serial.println(F("Error: Could not close socket"));
     }
     
     // Disconnect WiFi
     if ( !wifi.disconnect() ) {
-      Serial.println("Error: Could not disconnect from network");
+      Serial.println(F("Error: Could not disconnect from AP"));
     }
     
     // Do nothing
-    Serial.println("Finished WebClient test");
+    Serial.println(F("Finished WebClient test"));
+    
     while(true){
       delay(1000);
     }
