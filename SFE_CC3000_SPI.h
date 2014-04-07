@@ -72,6 +72,11 @@ extern long SpiReadDataCont(void);
 extern void SpiResumeSpi(void);
 extern void SSIContReadOperation(void);
 extern void SpiTriggerRxProcessing(void);
+extern uint8_t get_spi_data_mode(void);
+extern uint8_t get_spi_bit_order(void);
+extern uint8_t get_spi_clock_div(void);
+extern void save_spi_params(void);
+extern void restore_spi_params(void);
 extern void cc3000_ISR(void);
 
 #endif

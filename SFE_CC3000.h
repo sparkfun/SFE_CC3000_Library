@@ -20,9 +20,6 @@
 #include "utility/wlan.h"                       // Needed for CC3000 #defines
 #include "utility/netapp.h"                     // Needed for struct types
 
-/* Clock definition for SPI */
-#define SPI_CLK_DIV             SPI_CLOCK_DIV2
-
 /* Constants for AP scanning */
 #define SCAN_MIN_DWELL_TIME     20              // Milliseconds
 #define SCAN_MAX_DWELL_TIME     30              // Milliseconds

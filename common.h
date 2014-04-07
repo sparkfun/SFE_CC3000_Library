@@ -17,6 +17,9 @@
  * If you enable debugging, make sure you call Serial.begin()! */
 #define DEBUG           0
 
+/* Clock divider for SPI */
+#define SPI_CLK_DIV             SPI_CLOCK_DIV2
+
 /* Define success and failure constants for CC3000 library functions. For
  * whatever reason, TI assigned 0 as success. */
 #define CC3000_SUCCESS  0
@@ -35,6 +38,9 @@ extern uint8_t g_int_num;
 extern uint8_t g_en_pin;
 extern uint8_t g_cs_pin;
 extern bool g_socket_connected;
+extern uint8_t g_saved_data_mode;
+extern uint8_t g_saved_bit_order;
+extern uint8_t g_saved_clock_div;
 extern volatile unsigned long ulSmartConfigFinished;
 extern volatile unsigned long ucStopSmartConfig;
 extern volatile unsigned long ulCC3000Connected;

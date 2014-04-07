@@ -31,6 +31,9 @@ uint8_t g_int_num;
 uint8_t g_en_pin;
 uint8_t g_cs_pin;
 bool g_socket_connected;
+uint8_t g_saved_data_mode;
+uint8_t g_saved_bit_order;
+uint8_t g_saved_clock_div;
 #if (DEBUG == 1)
 volatile long g_debug_interrupt;
 #endif
@@ -130,9 +133,9 @@ bool SFE_CC3000::init()
     
     /* Setup SPI */
     SPI.begin();
-    SPI.setDataMode(SPI_MODE1);
-    SPI.setBitOrder(MSBFIRST);
-    SPI.setClockDivider(SPI_CLK_DIV);
+    //SPI.setDataMode(SPI_MODE1);
+    //SPI.setBitOrder(MSBFIRST);
+    //SPI.setClockDivider(SPI_CLK_DIV);
     
     /* Initialize CC3000 library - provide callback definitions */
     wlan_init(  cc3000AsyncCallback,

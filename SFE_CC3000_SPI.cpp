@@ -165,6 +165,9 @@ void SpiOpen(gcSpiHandleRx pfRxHandler)
 //*****************************************************************************
 long SpiFirstWrite(unsigned char *ucBuf, unsigned short usLength)
 {
+    // Save SPI settings
+    save_spi_params();
+
 	// workaround for first transaction
 	digitalWrite(g_cs_pin, LOW);
 	
@@ -182,6 +185,9 @@ long SpiFirstWrite(unsigned char *ucBuf, unsigned short usLength)
 	sSpiInformation.ulSpiState = eSPI_STATE_IDLE;
 	
 	digitalWrite(g_cs_pin, HIGH);
+    
+    // Restore SPI settings
+    restore_spi_params();
 	
 	return(0);
 }
@@ -254,6 +260,9 @@ long SpiWrite(unsigned char *pUserBuffer, unsigned short usLength)
 		sSpiInformation.ulSpiState = eSPI_STATE_WRITE_IRQ;
 		sSpiInformation.pTxPacket = pUserBuffer;
 		sSpiInformation.usTxPacketLength = usLength;
+        
+        // Save SPI settings
+        save_spi_params();
 		
 		// Assert the CS line and wait till SSI IRQ line is active and then
 		// initialize write operation
@@ -270,6 +279,9 @@ long SpiWrite(unsigned char *pUserBuffer, unsigned short usLength)
 			sSpiInformation.ulSpiState = eSPI_STATE_IDLE;
 
 			digitalWrite(g_cs_pin, HIGH);
+            
+            // Restore SPI settings
+            restore_spi_params();
 		}
 	}
 	
@@ -482,6 +494,9 @@ void SpiTriggerRxProcessing(void)
 	// Trigger Rx processing
 	SpiPauseSpi();
 	digitalWrite(g_cs_pin, HIGH);
+    
+    // Restore SPI settings
+    restore_spi_params();
 	
 	// The magic number that resides at the end of the TX/RX buffer (1 byte 
     // after the allocated size) for the purpose of detection of the overrun. 
@@ -503,6 +518,78 @@ void SpiTriggerRxProcessing(void)
 //*****************************************************************************
 
 /**
+ * @brief Gets the SPI mode from the SPI control register
+ *
+ * Returns the SPI mode as given by:
+ * 0x00 = MODE0
+ * 0x04 = MODE1
+ * 0x08 = MODE2
+ * 0x0C = MODE3
+ *
+ * @return The SPI mode 
+ */
+uint8_t get_spi_data_mode(void) {
+    return (SPCR & SPI_MODE_MASK);
+}
+
+/**
+ * @brief Gets the bit order (MSB or LSB first) of SPI transactions
+ *
+ * @return 1 for MSB first, 0 for LSB first
+ */
+uint8_t get_spi_bit_order(void) {
+    return bitRead(SPCR, DORD) ? 0 : 1;
+}
+
+/**
+ * @brief Gets the clock divider for SPI
+ *
+ * Returns the clock divider for SPI based on the SPCR and SPSR registers.
+ * 0x00 = DIV4
+ * 0x01 = DIV16
+ * 0x02 = DIV64
+ * 0x03 = DIV128
+ * 0x04 = DIV2
+ * 0x05 = DIV8
+ * 0x06 = DIV32
+ * 0x07 = DIV64 (not implemented in Arduino)
+ *
+ * @return value of SPI2X, SPR1, and SPR0 bits as an unsigned 8-bit integer
+ */
+uint8_t get_spi_clock_div(void) {
+    uint8_t clock_div;
+    clock_div = (SPCR & SPI_CLOCK_MASK);
+    clock_div = clock_div | ((SPSR & SPI_2XCLOCK_MASK) << 2);
+    return clock_div;
+}
+
+/**
+ * @brief Saves the current SPI parameters in global variables
+ */
+void save_spi_params(void) {
+
+    /* Save current SPI settings */
+    g_saved_data_mode = get_spi_data_mode();
+    g_saved_bit_order = get_spi_bit_order();
+    g_saved_clock_div = get_spi_clock_div();
+    
+    /* Set SPI settings for CC3000 */
+    SPI.setDataMode(SPI_MODE1);
+    SPI.setBitOrder(MSBFIRST);
+    SPI.setClockDivider(SPI_CLK_DIV);
+    
+}
+
+/**
+ * @brief Restores the previously saved SPI parameters
+ */
+void restore_spi_params(void) {
+    SPI.setDataMode(g_saved_data_mode);
+    SPI.setBitOrder(g_saved_bit_order);
+    SPI.setClockDivider(g_saved_clock_div);
+}
+
+/**
  * @brief Interrupt Service Routine for GPIO interrupt
  */
 void cc3000_ISR(void)
@@ -516,6 +603,9 @@ void cc3000_ISR(void)
     else if (sSpiInformation.ulSpiState == eSPI_STATE_IDLE)
     {
         sSpiInformation.ulSpiState = eSPI_STATE_READ_IRQ;
+        
+        // Save SPI settings
+        save_spi_params();
         
         //IRQ line goes down - we are start reception
         digitalWrite(g_cs_pin, LOW);
@@ -535,6 +625,9 @@ void cc3000_ISR(void)
         sSpiInformation.ulSpiState = eSPI_STATE_IDLE;
         
         digitalWrite(g_cs_pin, HIGH);
+        
+        // Restore SPI settings
+        restore_spi_params();
     }
     
 }
