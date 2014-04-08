@@ -184,6 +184,7 @@ bool SFE_CC3000_Client::available()
 int SFE_CC3000_Client::read()
 {
     uint8_t b;
+    
     if (recv(socket_, &b, 1, 0) > 0) {
         return b;
     } else {

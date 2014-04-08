@@ -3,12 +3,18 @@ SFE_CC3000_Library
 
 Arduino library for the TI CC3000 WiFi [Shield](https://www.sparkfun.com/products/12071) and [Breakout Board](https://www.sparkfun.com/products/12072).
 
+Version
+-------
+
+**v1.1**
+
 Known Issues
 ------------
 
 The following are known problems with the library and are being actively worked on:
 
-* SD Card libraries causes the CC3000 library to hang (when used together).
+* Tx/Rx buffers for the CC3000 can easily overflow. Buffer checks need to be added to the library.
+* AES encryption for SmartConfig is not supported.
 * Static IP is not working at this time (only DHCP works).
 * HTTP POST requests work but do not print the whole server response to the console.
 * The library does not work with any Teensey boards. Only ATmega328-based Arduinos have been tested.
@@ -29,10 +35,15 @@ Getting Started
 * Click "Upload"
 * Go to Tools -> Serial Monitor
 * Ensure the baud rate is set at 115200 baud
-* The program should connect and print out the HTML of [www.example.com](http://www.example.com)!
+* The program should connect and print out the HTML of [www.example.com](http://www.example.com)
 
 Version History
 ---------------
+
+**v1.1**
+
+* Fixed SD card incompatibility issues
+* Added WebClientSD.ino example sketch to show SD card working with CC3000
 
 **v1.0**
 
