@@ -6,7 +6,7 @@ Arduino library for the TI CC3000 WiFi [Shield](https://www.sparkfun.com/product
 Version
 -------
 
-**v1.1**
+**v1.2**
 
 Known Issues
 ------------
@@ -39,6 +39,10 @@ Getting Started
 
 Version History
 ---------------
+
+**v1.2**
+
+* Added support for the Arduino Mega
 
 **v1.1**
 

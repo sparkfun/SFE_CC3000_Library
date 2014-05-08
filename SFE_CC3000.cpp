@@ -113,9 +113,37 @@ bool SFE_CC3000::init()
             break;
         default:
 # if (DEBUG == 1)
-        Serial.println("ERROR: Interrupt line not attached to pin 2 or 3");
+            Serial.println("ERROR: Interrupt line not attached to pin 2 or 3");
 # endif
-        return false;
+            return false;
+    }
+#elif defined(__AVR_ATmega1281__) || defined(__AVR_ATmega2561__) || \
+    defined(__AVR_ATmega2560__) || defined(__AVR_ATmega1280__)
+    
+    switch (g_int_pin) {
+        case 2:
+            g_int_num = 0;
+            break;
+        case 3:
+            g_int_num = 1;
+            break;
+        case 18:
+            g_int_num = 5;
+            break;
+        case 19:
+            g_int_num = 4;
+            break;
+        case 20:
+            g_int_num = 3;
+            break;
+        case 21:
+            g_int_num = 2;
+            break;
+        default:
+# if (DEBUG == 1)
+            Serial.println("ERROR: Interrupt not pin 2, 3, 18, 19, 20, or 21");
+# endif
+            return false;
     }
 #else
 # if (DEBUG == 1)
