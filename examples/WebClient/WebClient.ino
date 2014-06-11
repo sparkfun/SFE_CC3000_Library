@@ -105,7 +105,7 @@ void setup() {
   // Make a TCP connection to remote host
   Serial.print("Performing HTTP GET of: ");
   Serial.println(server);
-  if ( !client.connect(server, 80, TCP) ) {
+  if ( !client.connect(server, 80) ) {
     Serial.println("Error: Could not make a TCP connection");
   }
   
