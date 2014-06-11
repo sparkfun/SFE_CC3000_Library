@@ -46,7 +46,7 @@ bool SFE_CC3000_Client::connect(    char *hostname,
                                     uint16_t port, 
                                     unsigned int protocol)
 {
-    IPAddr remote_ip;
+    IPAddress remote_ip;
 
     /* If CC3000 is not connected to a network, return false. */
     if (    !cc3000_->getInitStatus() || 
@@ -56,7 +56,7 @@ bool SFE_CC3000_Client::connect(    char *hostname,
     }
     
     /* Perform a DNS lookup of the site */
-    if (!cc3000_->dnsLookup(hostname, remote_ip)) {
+    if (!cc3000_->dnsLookup(hostname, &remote_ip)) {
         return false;
     }
     
@@ -72,7 +72,7 @@ bool SFE_CC3000_Client::connect(    char *hostname,
  * @param[in] protocol Internet Protocol (default: TCP)
  * @return True if connected to remote server. False otherwise.
  */
-bool SFE_CC3000_Client::connect(    IPAddr &ip_address, 
+bool SFE_CC3000_Client::connect(    IPAddress ip_address, 
                                     uint16_t port, 
                                     unsigned int protocol)
 {
@@ -101,7 +101,7 @@ bool SFE_CC3000_Client::connect(    IPAddr &ip_address,
     
     /* Fill out the destination IP address */
     for (i = 0; i < 4; i++) {
-        dest_addr.sa_data[i + 2] = ip_address.address[i];
+        dest_addr.sa_data[i + 2] = ip_address[i];
     }
     
     /* Set the rest of the dest_addr struct to 0 */

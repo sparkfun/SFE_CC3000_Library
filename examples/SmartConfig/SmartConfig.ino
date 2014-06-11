@@ -71,8 +71,8 @@ SFE_CC3000 wifi = SFE_CC3000(CC3000_INT, CC3000_EN, CC3000_CS);
 void setup() {
   
   ConnectionInfo connection_info;
-  IPAddr ip_addr;
-  IPAddr remote_ip;
+  IPAddress ip_addr;
+  IPAddress remote_ip;
   PingReport ping_report = {0};
   int i;
   
@@ -116,12 +116,12 @@ void setup() {
   // Perform a DNS lookup to get the IP address of a host
   Serial.print("Looking up IP address of: ");
   Serial.println(remote_host);
-  if ( !wifi.dnsLookup(remote_host, remote_ip) ) {
+  if ( !wifi.dnsLookup(remote_host, &remote_ip) ) {
     Serial.println("Error: Could not lookup host by name");
   } else {
     Serial.print("IP address found: ");
     for (i = 0; i < IP_ADDR_LEN; i++) {
-      Serial.print(remote_ip.address[i], DEC);
+      Serial.print(remote_ip[i], DEC);
       if ( i < IP_ADDR_LEN - 1 ) {
         Serial.print(".");
       }
@@ -132,7 +132,7 @@ void setup() {
   // Ping IP address of remote host
   Serial.print("Pinging ");
   for (i = 0; i < IP_ADDR_LEN; i++) {
-    Serial.print(remote_ip.address[i], DEC);
+    Serial.print(remote_ip[i], DEC);
     if ( i < IP_ADDR_LEN - 1 ) {
       Serial.print(".");
     }
@@ -175,4 +175,4 @@ void loop() {
   // Do nothing
   delay(1000);
   
-}
+} 

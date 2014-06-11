@@ -16,7 +16,8 @@
 
 #include "SFE_CC3000.h"
 #include "utility/socket.h"                 // Needed for socket communications
-
+#include "Client.h"
+ 
 /* Constants for IP protocol types */
 #define TCP     IPPROTO_TCP
 #define UDP     IPPROTO_UDP
@@ -29,7 +30,7 @@ public:
     bool connect(   char *hostname, 
                     uint16_t port = 80, 
                     unsigned int protocol = TCP);
-    bool connect(   IPAddr &ip_address, 
+    bool connect(   IPAddress ip_address, 
                     uint16_t port = 80, 
                     unsigned int protocol = TCP);
     virtual size_t write(uint8_t c);

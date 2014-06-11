@@ -600,7 +600,7 @@ bool SFE_CC3000::disconnect()
  * @param[out] ip_address returned IP address of the hostname
  * @return True if lookup completed successfully. False otherwise.
  */
-bool SFE_CC3000::dnsLookup(char *hostname, IPAddr &ip_address)
+bool SFE_CC3000::dnsLookup(char *hostname, IPAddress *ip_address)
 {
     unsigned long ret_ip_addr = 0;
 
@@ -623,12 +623,12 @@ bool SFE_CC3000::dnsLookup(char *hostname, IPAddr &ip_address)
     if (!gethostbyname(hostname, strlen(hostname), &ret_ip_addr)) {
         return false;
     }
-    
-    /* Fill out return IP address value */
-    ip_address.address[3] = ret_ip_addr & 0xFF;
-    ip_address.address[2] = (ret_ip_addr >> 8) & 0xFF;
-    ip_address.address[1] = (ret_ip_addr >> 16) & 0xFF;
-    ip_address.address[0] = (ret_ip_addr >> 24) & 0xFF;
+
+    *ip_address = IPAddress(
+        (uint8_t)(ret_ip_addr >> 24) & 0xFF,
+        (uint8_t)(ret_ip_addr >> 16) & 0xFF,
+        (uint8_t)(ret_ip_addr >> 8) & 0xFF,
+        (uint8_t)ret_ip_addr & 0xFF);
 
     return true;
 }
@@ -643,7 +643,7 @@ bool SFE_CC3000::dnsLookup(char *hostname, IPAddr &ip_address)
  * @param[in] timeout optional time to wait for ping response (milliseconds)
  * @return True if ping command succeeded. False otherwise.
  */
-bool SFE_CC3000::ping(  IPAddr &ip_address, 
+bool SFE_CC3000::ping(  IPAddress ip_address, 
                         PingReport &ping_report,
                         unsigned int attempts, 
                         unsigned int size, 
@@ -668,10 +668,10 @@ bool SFE_CC3000::ping(  IPAddr &ip_address,
     }
     
     /* Create unsigned long IP address out of char array */
-    ip_addr = (unsigned long)ip_address.address[0] | 
-                ((unsigned long)ip_address.address[1] << 8) |
-                ((unsigned long)ip_address.address[2] << 16) |
-                ((unsigned long)ip_address.address[3] << 24);
+    ip_addr = (unsigned long)ip_address[0] | 
+                ((unsigned long)ip_address[1] << 8) |
+                ((unsigned long)ip_address[2] << 16) |
+                ((unsigned long)ip_address[3] << 24);
                 
     /* Send pings and wait for report */
     if (netapp_ping_send(&ip_addr, attempts, size, timeout) != CC3000_SUCCESS) {
