@@ -44,8 +44,8 @@ Version History
 **v1.3**
 
 * Merged pull request from Jacob Rosenthal (https://github.com/jacobrosenthal)
-..* Changed IP Addresses to conform to Arduino's other networking libraries (e.g. using the IPAddress class)
-..* Implemented UDP connections
+  * Changed IP Addresses to conform to Arduino's other networking libraries (e.g. using the IPAddress class)
+  * Implemented UDP connections
 
 **v1.2**
 
