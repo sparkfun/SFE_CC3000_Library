@@ -19,6 +19,7 @@
 
 #include "utility/wlan.h"                       // Needed for CC3000 #defines
 #include "utility/netapp.h"                     // Needed for struct types
+#include "Client.h"
 
 /* Constants for AP scanning */
 #define SCAN_MIN_DWELL_TIME     20              // Milliseconds
@@ -74,11 +75,6 @@ typedef struct PingReports
 	unsigned long avg_round_time;
 } PingReport;
 
-/* Struct for holding a set-length IP address for the user */
-typedef struct IPAddr {
-    unsigned char address[4];
-} IPAddr;
-
 /* CC3000 class */
 class SFE_CC3000 {
 public:
@@ -96,8 +92,8 @@ public:
     bool startSmartConfig(unsigned int timeout = 3000);
     bool fastConnect(unsigned int timeout = 3000);
     bool disconnect();
-    bool dnsLookup(char *hostname, IPAddr &ip_address);
-    bool ping(  IPAddr &ip_address, 
+    bool dnsLookup(char *hostname, IPAddress *ip_address);
+    bool ping(  IPAddress ip_address, 
                 PingReport &ping_report,
                 unsigned int attempts = 1, 
                 unsigned int size = 56, 
