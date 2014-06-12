@@ -2,6 +2,7 @@
  * @file    SFE_CC3000_Client.cpp
  * @brief   Library for the SparkFun CC3000 shield and breakout boards
  * @author  Shawn Hymel (SparkFun Electronics)
+ * @author  Revisions by Jacob Rosenthal (https://github.com/jacobrosenthal)
  * 
  * @copyright   This code is public domain but you buy me a beer if you use
  * this and we meet someday (Beerware license).

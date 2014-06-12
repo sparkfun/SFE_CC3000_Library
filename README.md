@@ -6,7 +6,7 @@ Arduino library for the TI CC3000 WiFi [Shield](https://www.sparkfun.com/product
 Version
 -------
 
-**v1.2**
+**v1.3**
 
 Known Issues
 ------------
@@ -18,6 +18,7 @@ The following are known problems with the library and are being actively worked 
 * Static IP is not working at this time (only DHCP works).
 * HTTP POST requests work but do not print the whole server response to the console.
 * The library does not work with any Teensey boards. Only ATmega328-based Arduinos have been tested.
+* UDP has been tested for transmit only. Receiving UDP packets on the CC3000 is currently not working.
 
 Getting Started
 ---------------
@@ -39,6 +40,12 @@ Getting Started
 
 Version History
 ---------------
+
+**v1.3**
+
+* Merged pull request from Jacob Rosenthal (https://github.com/jacobrosenthal)
+..* Changed IP Addresses to conform to Arduino's other networking libraries (e.g. using the IPAddress class)
+..* Implemented UDP connections
 
 **v1.2**
 
