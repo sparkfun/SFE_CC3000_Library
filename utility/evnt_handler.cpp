@@ -214,7 +214,6 @@ hci_event_handler(void *pRetParams, unsigned char *from, unsigned char *fromlen)
 	{
 		if (tSLInformation.usEventOrDataReceived != 0)
 		{		
-		
 			pucReceivedData = (tSLInformation.pucReceivedData);
 
 			if (*pucReceivedData == HCI_TYPE_EVNT)

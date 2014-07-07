@@ -6,7 +6,7 @@ Arduino library for the TI CC3000 WiFi [Shield](https://www.sparkfun.com/product
 Version
 -------
 
-**v1.3**
+**v1.4**
 
 Known Issues
 ------------
@@ -17,7 +17,7 @@ The following are known problems with the library and are being actively worked 
 * AES encryption for SmartConfig is not supported.
 * Static IP is not working at this time (only DHCP works).
 * HTTP POST requests work but do not print the whole server response to the console.
-* The library does not work with any Teensey boards. Only ATmega328-based Arduinos have been tested.
+* The library does not work with any Teensey boards. Only ATmega328- and ATmega2560-based Arduinos have been tested.
 * UDP has been tested for transmit only. Receiving UDP packets on the CC3000 is currently not working.
 
 Getting Started
@@ -40,6 +40,10 @@ Getting Started
 
 Version History
 ---------------
+
+**v1.4**
+
+* Added CS pin de-assertion on init to allow for other non-default CS pins
 
 **v1.3**
 

@@ -158,13 +158,15 @@ bool SFE_CC3000::init()
     pinMode(g_en_pin, OUTPUT);
     pinMode(g_cs_pin, OUTPUT);
     digitalWrite(g_en_pin, LOW);
-    digitalWrite(g_cs_pin, LOW);
     
     /* Setup SPI */
     SPI.begin();
-    //SPI.setDataMode(SPI_MODE1);
-    //SPI.setBitOrder(MSBFIRST);
-    //SPI.setClockDivider(SPI_CLK_DIV);
+    SPI.setDataMode(SPI_MODE1);
+    SPI.setBitOrder(MSBFIRST);
+    SPI.setClockDivider(SPI_CLK_DIV);
+    
+    /* De-assert CS */
+    digitalWrite(g_cs_pin, HIGH);
     
     /* Initialize CC3000 library - provide callback definitions */
     wlan_init(  cc3000AsyncCallback,
