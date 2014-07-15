@@ -6,7 +6,7 @@ Arduino library for the TI CC3000 WiFi [Shield](https://www.sparkfun.com/product
 Version
 -------
 
-**v1.4**
+**v1.5**
 
 Known Issues
 ------------
@@ -40,6 +40,10 @@ Getting Started
 
 Version History
 ---------------
+
+**v1.5**
+
+* Added support for ATmega32u4 (Arduino Leonardo)
 
 **v1.4**
 

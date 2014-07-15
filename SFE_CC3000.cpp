@@ -146,6 +146,29 @@ bool SFE_CC3000::init()
 # endif
             return false;
     }
+#elif defined(__AVR_ATmega32U4__)
+    switch (g_int_pin) {
+        case 3:
+            g_int_num = 0;
+            break;
+        case 2:
+            g_int_num = 1;
+            break;
+        case 0:
+            g_int_num = 2;
+            break;
+        case 1:
+            g_int_num = 3;
+            break;
+        case 7:
+            g_int_num = 4;
+            break;
+        default:
+# if (DEBUG == 1)
+            Serial.println("ERROR: Interrupt not pin 0, 1, 2, 3, or 7");
+# endif
+            return false;
+    }
 #else
 # if (DEBUG == 1)
         Serial.println("ERROR: Microcontroller not supported");
