@@ -1,10 +1,12 @@
 {
-  "name": "SFE-Arduino-CC3000",
+  "name": "SparkFun-CC3000",
   "keywords": "wifi, wi-fi, http, web, server, json, rest, spi",
   "description": "Arduino library for the TI CC3000 WiFi Shield and SparkFun Breakout Board",
   "repository":
   {
     "type": "git",
     "url": "https://github.com/sparkfun/SFE_CC3000_Library.git"
-  }
+  },
+  "frameworks": "arduino",
+  "platforms": "atmelavr"
 }
