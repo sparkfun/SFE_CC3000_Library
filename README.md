@@ -11,6 +11,8 @@ Version
 Known Issues
 ------------
 
+Note that the SFE_CC3000_Library was tested with CC3000 firmware v1.24.
+
 The following are known problems with the library and are being actively worked on:
 
 * Tx/Rx buffers for the CC3000 can easily overflow. Buffer checks need to be added to the library.
