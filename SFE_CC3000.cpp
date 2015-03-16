@@ -103,7 +103,14 @@ bool SFE_CC3000::init()
     }
     
     /* Determine available interrupt pins on supported microcontrollers */
-#if defined(__AVR_ATmega8__) || defined(__AVR_ATmega168__) || \
+#if defined(digitalPinToInterrupt)
+  // digitalPinToInterrupt macro is supported on Arduino 1.0.6+ and 1.5.6+
+  // returns NOT_AN_INTERRUPT (-1 = 0xFF) if g_irqPin is not mapped to an INT
+  #ifndef NOT_AN_INTERRUPT
+    #define NOT_AN_INTERRUPT (-1)
+  #endif
+  g_int_num = digitalPinToInterrupt(g_int_pin);
+#elif defined(__AVR_ATmega8__) || defined(__AVR_ATmega168__) || \
     defined(__AVR_ATmega328P__) || defined (__AVR_ATmega328__)
     switch (g_int_pin) {
         case 2:
